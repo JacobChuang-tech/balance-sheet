@@ -110,7 +110,7 @@
     text-decoration: none;
     font-size: var(--font-size-xs);
     transition: color var(--transition-fast);
-    min-width: 56px;
+    min-width: 48px;
   }
 
   .bottombar .nav-item--active {

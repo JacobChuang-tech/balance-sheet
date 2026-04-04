@@ -614,3 +614,224 @@
 .rate-table input {
   width: 120px;
 }
+
+/* Income & Expenses (P&L) */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.month-nav-label {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  min-width: 180px;
+  text-align: center;
+}
+
+.pnl-summary {
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.pnl-summary-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.pnl-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.pnl-summary-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pnl-summary-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+@media (max-width: 767px) {
+  .pnl-summary-value {
+    font-size: var(--font-size-xl);
+  }
+  .pnl-summary-row {
+    gap: var(--space-md);
+  }
+}
+
+.pnl-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: var(--space-lg);
+}
+
+.pnl-bar-income {
+  background: var(--color-green);
+  transition: width 0.3s ease;
+}
+
+.pnl-bar-expense {
+  background: var(--color-red);
+  transition: width 0.3s ease;
+}
+
+.pnl-savings-rate {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-sm);
+}
+
+.pnl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 767px) {
+  .pnl-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pnl-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.pnl-section-header .card-title {
+  margin-bottom: 0;
+}
+
+.pnl-category-list {
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pnl-category-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+}
+
+.pnl-txn-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.pnl-txn-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pnl-txn-item:last-child {
+  border-bottom: none;
+}
+
+.pnl-txn-item:hover {
+  background: var(--color-surface-hover);
+  margin: 0 calc(-1 * var(--space-sm));
+  padding-left: var(--space-sm);
+  padding-right: var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+.pnl-txn-icon {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.pnl-txn-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pnl-txn-desc {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pnl-txn-date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.pnl-txn-amount {
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+}
+
+.pnl-txn-actions {
+  display: flex;
+  gap: var(--space-xs);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.pnl-txn-item:hover .pnl-txn-actions {
+  opacity: 1;
+}
+
+/* Type toggle in modal */
+.pnl-type-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.pnl-type-btn {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  border: none;
+  cursor: pointer;
+}
+
+.pnl-type-btn:first-child {
+  border-right: 1px solid var(--color-border);
+}
+
+.pnl-type-btn--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.pnl-type-btn:hover:not(.pnl-type-btn--active) {
+  background: var(--color-surface-hover);
+}

@@ -81,6 +81,49 @@ export function createSnapshot(accounts, settings) {
   };
 }
 
+// Income & Expense categories
+export const INCOME_CATEGORIES = [
+  { key: 'salary', label: 'Salary', icon: '💰' },
+  { key: 'freelance', label: 'Freelance', icon: '💻' },
+  { key: 'investment_income', label: 'Investment Income', icon: '📈' },
+  { key: 'gifts_received', label: 'Gifts Received', icon: '🎁' },
+  { key: 'other_income', label: 'Other Income', icon: '💵' }
+];
+
+export const EXPENSE_CATEGORIES = [
+  { key: 'housing', label: 'Housing', icon: '🏠' },
+  { key: 'food', label: 'Food & Dining', icon: '🍽️' },
+  { key: 'transportation', label: 'Transportation', icon: '🚗' },
+  { key: 'shopping', label: 'Shopping', icon: '🛍️' },
+  { key: 'entertainment', label: 'Entertainment', icon: '🎬' },
+  { key: 'healthcare', label: 'Healthcare', icon: '🏥' },
+  { key: 'education', label: 'Education', icon: '📚' },
+  { key: 'utilities', label: 'Utilities', icon: '⚡' },
+  { key: 'insurance', label: 'Insurance', icon: '🛡️' },
+  { key: 'other_expense', label: 'Other Expense', icon: '📦' }
+];
+
+export const ALL_PNL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
+
+export function getPnlCategoryInfo(key) {
+  return ALL_PNL_CATEGORIES.find(c => c.key === key) || { key, label: key, icon: '📦' };
+}
+
+export function createTransaction({ type, category, amount, currency, description = '', date }) {
+  const now = new Date().toISOString();
+  return {
+    id: 'txn_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    type,
+    category,
+    amount: parseFloat(amount) || 0,
+    currency,
+    description,
+    date,
+    createdAt: now,
+    updatedAt: now
+  };
+}
+
 export function validateImport(data) {
   if (!data || typeof data !== 'object') return false;
   if (!data.version || !Array.isArray(data.accounts) || !Array.isArray(data.snapshots)) return false;

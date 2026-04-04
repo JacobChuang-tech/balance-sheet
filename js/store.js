@@ -11,7 +11,8 @@ const DEFAULT_DATA = {
     darkMode: false
   },
   accounts: [],
-  snapshots: []
+  snapshots: [],
+  transactions: []
 };
 
 let _data = null;
@@ -118,6 +119,59 @@ export function deleteSnapshot(id) {
   saveData();
 }
 
+// Transactions
+export function getTransactions() {
+  const data = loadData();
+  if (!data.transactions) data.transactions = [];
+  return data.transactions;
+}
+
+export function getTransactionsByMonth(yearMonth) {
+  return getTransactions().filter(t => t.date.startsWith(yearMonth));
+}
+
+export function upsertTransaction(transaction) {
+  const data = loadData();
+  if (!data.transactions) data.transactions = [];
+  const idx = data.transactions.findIndex(t => t.id === transaction.id);
+  if (idx >= 0) {
+    data.transactions[idx] = { ...data.transactions[idx], ...transaction, updatedAt: new Date().toISOString() };
+  } else {
+    data.transactions.push(transaction);
+  }
+  saveData();
+  return data.transactions[idx >= 0 ? idx : data.transactions.length - 1];
+}
+
+export function deleteTransaction(id) {
+  const data = loadData();
+  if (!data.transactions) data.transactions = [];
+  data.transactions = data.transactions.filter(t => t.id !== id);
+  saveData();
+}
+
+export function calculateMonthlyPnl(yearMonth) {
+  const settings = getSettings();
+  const txns = getTransactionsByMonth(yearMonth);
+  let totalIncome = 0;
+  let totalExpenses = 0;
+
+  for (const txn of txns) {
+    const inBase = convertToBase(txn.amount, txn.currency, settings);
+    if (txn.type === 'income') {
+      totalIncome += inBase;
+    } else {
+      totalExpenses += inBase;
+    }
+  }
+
+  return {
+    totalIncome,
+    totalExpenses,
+    netSavings: totalIncome - totalExpenses
+  };
+}
+
 // Settings
 export function getSettings() {
   return loadData().settings;
@@ -140,6 +194,7 @@ export function importData(json) {
   if (!parsed.version || !Array.isArray(parsed.accounts) || !Array.isArray(parsed.snapshots)) {
     throw new Error('Invalid data format');
   }
+  if (!Array.isArray(parsed.transactions)) parsed.transactions = [];
   _data = parsed;
   saveData();
   return _data;
