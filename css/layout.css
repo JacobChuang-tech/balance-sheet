@@ -1,0 +1,203 @@
+/* Desktop: sidebar + content */
+@media (min-width: 768px) {
+  body {
+    flex-direction: row;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    width: var(--sidebar-width);
+    height: 100dvh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    padding: var(--space-lg) 0;
+    z-index: 100;
+  }
+
+  .sidebar-header {
+    padding: 0 var(--space-lg) var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-md);
+  }
+
+  .sidebar-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: 0 var(--space-sm);
+  }
+
+  .sidebar .nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .sidebar .nav-item:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+
+  .sidebar .nav-item--active {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .sidebar .nav-icon {
+    display: flex;
+    align-items: center;
+  }
+
+  .sidebar .nav-label {
+    font-size: var(--font-size-base);
+  }
+
+  .bottombar {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: var(--sidebar-width);
+    padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+    max-width: calc(var(--content-max-width) + var(--space-xl) * 2);
+    width: 100%;
+  }
+}
+
+/* Mobile: bottom bar + content */
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+
+  .bottombar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--bottombar-height);
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottombar .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: var(--space-xs) var(--space-sm);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: var(--font-size-xs);
+    transition: color var(--transition-fast);
+    min-width: 56px;
+  }
+
+  .bottombar .nav-item--active {
+    color: var(--color-primary);
+  }
+
+  .bottombar .nav-icon {
+    display: flex;
+    align-items: center;
+  }
+
+  .bottombar .nav-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .main-content {
+    padding: var(--space-md) var(--space-md) calc(var(--bottombar-height) + var(--space-lg));
+  }
+}
+
+/* View header */
+.view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  gap: var(--space-md);
+}
+
+.view-header h1 {
+  font-size: var(--font-size-2xl);
+}
+
+/* Dashboard grid */
+.dashboard-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-grid > .card:first-child {
+    grid-column: 1;
+  }
+}
+
+/* Section labels */
+.section-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: var(--space-lg) 0 var(--space-sm);
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg);
+  gap: var(--space-sm);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: var(--space-sm);
+}
+
+.empty-state h3 {
+  color: var(--color-text);
+}
+
+.empty-state p {
+  color: var(--color-text-secondary);
+  max-width: 300px;
+}
+
+/* View loading */
+.view-loading {
+  opacity: 0.5;
+  transition: opacity var(--transition-fast);
+}

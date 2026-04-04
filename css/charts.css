@@ -1,0 +1,40 @@
+.chart-card {
+  min-height: 300px;
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 260px;
+}
+
+@media (max-width: 767px) {
+  .chart-container {
+    height: 220px;
+  }
+}
+
+.trend-controls {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.trend-btn {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-hover);
+  transition: all var(--transition-fast);
+}
+
+.trend-btn:hover {
+  color: var(--color-text);
+}
+
+.trend-btn--active {
+  background: var(--color-primary);
+  color: #fff;
+}
