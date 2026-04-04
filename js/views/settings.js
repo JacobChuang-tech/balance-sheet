@@ -1,4 +1,5 @@
-import { getSettings, updateSettings, exportData, importData, clearAllData } from '../store.js';
+import { getSettings, updateSettings, exportData, importData, clearAllData, syncFromDrive } from '../store.js';
+import { isSignedIn, getProfile, signIn, signOut } from '../gdrive.js';
 import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 
@@ -6,10 +7,39 @@ const AVAILABLE_CURRENCIES = ['TWD', 'USD', 'EUR', 'JPY', 'GBP', 'HKD', 'CNY', '
 
 export function render() {
   const settings = getSettings();
+  const signedIn = isSignedIn();
+  const profile = getProfile();
 
   return `
     <div class="view-header">
       <h1>Settings</h1>
+    </div>
+
+    <div class="card settings-section">
+      <h3 class="settings-section-title">Cloud Sync</h3>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Google Drive Sync</div>
+          <div class="settings-description">
+            ${signedIn && profile
+              ? `Signed in as ${profile.email}. Data syncs automatically.`
+              : 'Sign in to sync data across devices via Google Drive.'}
+          </div>
+        </div>
+        ${signedIn
+          ? `<button class="btn btn-secondary" id="gdrive-signout">Sign Out</button>`
+          : `<button class="btn btn-primary" id="gdrive-signin">Sign in with Google</button>`
+        }
+      </div>
+      ${signedIn ? `
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Sync Now</div>
+            <div class="settings-description">Pull latest data from Google Drive</div>
+          </div>
+          <button class="btn btn-secondary" id="gdrive-sync">Sync</button>
+        </div>
+      ` : ''}
     </div>
 
     <div class="card settings-section">
@@ -112,6 +142,39 @@ export function render() {
 }
 
 export function mount(container) {
+  // Google Drive sign in/out
+  const signinBtn = container.querySelector('#gdrive-signin');
+  if (signinBtn) {
+    signinBtn.addEventListener('click', () => signIn());
+  }
+
+  const signoutBtn = container.querySelector('#gdrive-signout');
+  if (signoutBtn) {
+    signoutBtn.addEventListener('click', () => {
+      signOut();
+      showToast('Signed out from Google Drive');
+      window.__rerender();
+    });
+  }
+
+  const syncBtn = container.querySelector('#gdrive-sync');
+  if (syncBtn) {
+    syncBtn.addEventListener('click', async () => {
+      syncBtn.textContent = 'Syncing...';
+      syncBtn.disabled = true;
+      const updated = await syncFromDrive();
+      if (updated) {
+        showToast('Data synced from Google Drive');
+        window.__applyTheme();
+        window.__rerender();
+      } else {
+        showToast('Already up to date', 'info');
+        syncBtn.textContent = 'Sync';
+        syncBtn.disabled = false;
+      }
+    });
+  }
+
   // Base currency
   container.querySelector('#base-currency').addEventListener('change', (e) => {
     updateSettings({ baseCurrency: e.target.value });

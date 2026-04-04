@@ -1,5 +1,6 @@
 import { initNav } from './components/nav.js';
-import { getSettings } from './store.js';
+import { getSettings, syncFromDrive } from './store.js';
+import { initGoogleAuth, onSignInChange } from './gdrive.js';
 
 const views = {};
 
@@ -64,6 +65,19 @@ function init() {
   initNav();
   render();
   window.addEventListener('hashchange', render);
+
+  // Google Drive auth — reads client ID from a meta tag or config
+  const clientId = document.querySelector('meta[name="google-client-id"]')?.content;
+  if (clientId) {
+    initGoogleAuth(clientId);
+    onSignInChange(async (signedIn) => {
+      if (signedIn) {
+        const updated = await syncFromDrive();
+        if (updated) applyTheme();
+      }
+      render();
+    });
+  }
 }
 
 // Expose for settings toggle

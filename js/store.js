@@ -1,3 +1,5 @@
+import { isSignedIn, saveToDrive, loadFromDrive } from './gdrive.js';
+
 const STORAGE_KEY = 'balancesheet_data';
 
 const DEFAULT_DATA = {
@@ -13,6 +15,7 @@ const DEFAULT_DATA = {
 };
 
 let _data = null;
+let _syncTimer = null;
 
 function loadData() {
   if (_data) return _data;
@@ -27,6 +30,37 @@ function loadData() {
 
 function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(_data));
+  scheduleDriveSync();
+}
+
+// Debounced sync — waits 2s after last change, then pushes to Drive
+function scheduleDriveSync() {
+  if (_syncTimer) clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(() => {
+    if (isSignedIn()) {
+      saveToDrive(loadData()).catch(e => console.warn('Drive sync failed:', e));
+    }
+  }, 2000);
+}
+
+// Pull data from Drive (called after sign-in)
+export async function syncFromDrive() {
+  if (!isSignedIn()) return false;
+  try {
+    const driveData = await loadFromDrive();
+    if (!driveData) {
+      // No data on Drive yet — push local data up
+      await saveToDrive(loadData());
+      return false;
+    }
+    // Merge strategy: Drive wins (latest cloud version)
+    _data = driveData;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(_data));
+    return true; // data was updated from Drive
+  } catch (e) {
+    console.warn('Failed to sync from Drive:', e);
+    return false;
+  }
 }
 
 // Accounts

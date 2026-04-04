@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Balance Sheet — Personal Net Worth Tracker</title>
+  <!-- Replace YOUR_CLIENT_ID with your Google Cloud OAuth client ID -->
+  <meta name="google-client-id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
@@ -21,6 +23,7 @@
   <div id="modal-root"></div>
   <div id="toast-root"></div>
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="lib/chart.min.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
