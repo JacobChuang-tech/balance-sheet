@@ -23,14 +23,14 @@ export function onSignInChange(callback) {
   _onSignInChange = callback;
 }
 
-export function initGoogleAuth(clientId) {
-  if (!window.google?.accounts?.oauth2) {
-    console.warn('Google Identity Services not loaded');
-    return;
-  }
+let _clientId = null;
+
+function _initTokenClient() {
+  if (_tokenClient) return true;
+  if (!window.google?.accounts?.oauth2) return false;
 
   _tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: clientId,
+    client_id: _clientId,
     scope: SCOPES + ' https://www.googleapis.com/auth/userinfo.profile',
     callback: async (response) => {
       if (response.error) {
@@ -57,6 +57,19 @@ export function initGoogleAuth(clientId) {
       if (_onSignInChange) _onSignInChange(true);
     }
   });
+  return true;
+}
+
+export function initGoogleAuth(clientId) {
+  _clientId = clientId;
+  if (!_initTokenClient()) {
+    // GIS script not loaded yet — retry when it loads
+    const check = setInterval(() => {
+      if (_initTokenClient()) clearInterval(check);
+    }, 200);
+    // Stop checking after 10 seconds
+    setTimeout(() => clearInterval(check), 10000);
+  }
 }
 
 export function signIn() {
