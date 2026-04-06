@@ -1,6 +1,7 @@
 import { getAccounts, getSnapshots, calculateNetWorth, getSettings, convertToBase } from '../store.js';
 import { ASSET_CATEGORIES, LIABILITY_CATEGORIES, getCategoryInfo } from '../models.js';
 import { formatCurrency } from '../components/currency.js';
+import { t } from '../i18n.js';
 
 export function render() {
   const settings = getSettings();
@@ -16,9 +17,10 @@ export function render() {
     const pct = lastSnap.netWorth !== 0 ? ((change / Math.abs(lastSnap.netWorth)) * 100) : 0;
     const sign = change >= 0 ? '+' : '';
     const colorClass = change >= 0 ? 'text-green' : 'text-red';
+    const changeStr = `${sign}${formatCurrency(change, settings.baseCurrency)} (${sign}${pct.toFixed(1)}%)`;
     changeHTML = `
       <div class="net-worth-change ${colorClass}">
-        ${sign}${formatCurrency(change, settings.baseCurrency)} (${sign}${pct.toFixed(1)}%) since last snapshot
+        ${t('dashboard.sinceLastSnapshotTemplate', changeStr)}
       </div>
     `;
   }
@@ -28,20 +30,20 @@ export function render() {
 
   return `
     <div class="view-header">
-      <h1>Dashboard</h1>
+      <h1>${t('dashboard.title')}</h1>
     </div>
 
     <div class="net-worth-card card">
-      <div class="net-worth-label">Net Worth</div>
+      <div class="net-worth-label">${t('dashboard.netWorth')}</div>
       <div class="net-worth-value ${netWorth < 0 ? 'text-red' : ''}">${formatCurrency(netWorth, settings.baseCurrency)}</div>
       ${changeHTML}
       <div class="net-worth-breakdown">
         <div class="net-worth-breakdown-item">
-          <span class="breakdown-label">Total Assets</span>
+          <span class="breakdown-label">${t('dashboard.totalAssets')}</span>
           <span class="breakdown-value text-green">${formatCurrency(totalAssets, settings.baseCurrency)}</span>
         </div>
         <div class="net-worth-breakdown-item">
-          <span class="breakdown-label">Total Liabilities</span>
+          <span class="breakdown-label">${t('dashboard.totalLiabilities')}</span>
           <span class="breakdown-value text-red">${formatCurrency(totalLiabilities, settings.baseCurrency)}</span>
         </div>
       </div>
@@ -50,21 +52,21 @@ export function render() {
     ${accounts.length === 0 ? `
       <div class="empty-state">
         <div class="empty-state-icon">🏦</div>
-        <h3>Get started</h3>
-        <p>Add your accounts to see your net worth.</p>
-        <a href="#/accounts" class="btn btn-primary">+ Add Account</a>
+        <h3>${t('dashboard.getStarted')}</h3>
+        <p>${t('dashboard.addAccountsToSee')}</p>
+        <a href="#/accounts" class="btn btn-primary">${t('dashboard.addAccount')}</a>
       </div>
     ` : `
       <div class="dashboard-grid">
         <div class="card chart-card">
-          <h3 class="card-title">Asset Allocation</h3>
+          <h3 class="card-title">${t('dashboard.assetAllocation')}</h3>
           <div class="chart-container">
             <canvas id="allocation-chart"></canvas>
           </div>
         </div>
 
         <div class="card">
-          <h3 class="card-title">By Category</h3>
+          <h3 class="card-title">${t('dashboard.byCategory')}</h3>
           <div class="category-breakdown">
             ${categoryData.map(cat => `
               <div class="category-row">
@@ -77,7 +79,7 @@ export function render() {
         </div>
 
         <div class="card">
-          <h3 class="card-title">All Accounts</h3>
+          <h3 class="card-title">${t('dashboard.allAccounts')}</h3>
           <div class="account-summary-list">
             ${accounts.map(acc => `
               <div class="account-summary-item">
@@ -114,7 +116,7 @@ function computeCategoryBreakdown(accounts, settings) {
     }, 0);
 
     const type = ASSET_CATEGORIES.some(c => c.key === cat.key) ? 'asset' : 'liability';
-    result.push({ ...cat, total, type });
+    result.push({ ...cat, label: t('category.' + cat.key) || cat.label, total, type });
   }
 
   return result;

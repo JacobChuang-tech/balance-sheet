@@ -1,6 +1,8 @@
 import { initNav } from './components/nav.js';
 import { getSettings, syncFromDrive } from './store.js';
 import { initGoogleAuth, onSignInChange } from './gdrive.js';
+import { setLanguage, t } from './i18n.js';
+import { autoRefreshIfStale } from './rates.js';
 
 const views = {};
 
@@ -46,9 +48,9 @@ async function render() {
     app.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-icon">🚧</div>
-        <h3>View not found</h3>
-        <p>The page "${route}" doesn't exist yet.</p>
-        <a href="#/dashboard" class="btn btn-primary">Go to Dashboard</a>
+        <h3>${t('error.viewNotFound')}</h3>
+        <p>${t('error.pageDoesntExist', route)}</p>
+        <a href="#/dashboard" class="btn btn-primary">${t('error.goToDashboard')}</a>
       </div>
     `;
   }
@@ -59,12 +61,23 @@ function applyTheme() {
   document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
 }
 
+function applyLanguage() {
+  const settings = getSettings();
+  setLanguage(settings.language || 'en');
+}
+
 // Initialize app
 function init() {
+  applyLanguage();
   applyTheme();
   initNav();
   render();
   window.addEventListener('hashchange', render);
+
+  // Auto-refresh exchange rates if stale (>24h), silently in background
+  autoRefreshIfStale().then(updated => {
+    if (updated) render();
+  });
 
   // Google Drive auth — reads client ID from a meta tag or config
   const clientId = document.querySelector('meta[name="google-client-id"]')?.content;
@@ -82,6 +95,7 @@ function init() {
 
 // Expose for settings toggle
 window.__applyTheme = applyTheme;
+window.__applyLanguage = applyLanguage;
 window.__rerender = render;
 
 if (document.readyState === 'loading') {

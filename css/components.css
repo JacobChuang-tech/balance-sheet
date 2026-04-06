@@ -835,3 +835,142 @@
 .pnl-type-btn:hover:not(.pnl-type-btn--active) {
   background: var(--color-surface-hover);
 }
+
+/* ===== Mobile-specific improvements ===== */
+@media (max-width: 767px) {
+  /* View header: stack when button text is long */
+  .view-header {
+    flex-wrap: wrap;
+  }
+
+  .view-header h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  /* Snapshot cards: stack vertically */
+  .snapshot-card {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  .snapshot-date {
+    min-width: auto;
+    width: 100%;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .snapshot-nw {
+    text-align: left;
+    font-size: var(--font-size-xl);
+  }
+
+  .snapshot-change {
+    min-width: auto;
+    text-align: left;
+  }
+
+  .snapshot-actions {
+    opacity: 1;
+    margin-left: auto;
+  }
+
+  /* Account items: always show actions on touch */
+  .account-item {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .account-item-actions {
+    opacity: 1;
+  }
+
+  .account-item-amount {
+    font-size: var(--font-size-base);
+  }
+
+  /* Transaction items: always show actions on touch */
+  .pnl-txn-actions {
+    opacity: 1;
+  }
+
+  .pnl-txn-item:hover {
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+    border-radius: 0;
+  }
+
+  /* Settings rows: allow wrapping */
+  .settings-row {
+    flex-wrap: wrap;
+  }
+
+  .settings-row > div:first-child {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Trends history table: horizontal scroll */
+  .card:has(table) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Touch targets: ensure min 44px */
+  .btn-icon,
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Cards: slightly tighter padding on mobile */
+  .card {
+    padding: var(--space-md);
+  }
+
+  .net-worth-card {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .net-worth-breakdown {
+    gap: var(--space-lg);
+  }
+
+  .breakdown-value {
+    font-size: var(--font-size-lg);
+  }
+
+  /* Month nav tighter */
+  .month-nav {
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .month-nav-label {
+    min-width: 140px;
+    font-size: var(--font-size-base);
+  }
+
+  /* Modal: full-width on mobile */
+  .modal-overlay {
+    padding: var(--space-sm);
+    align-items: flex-end;
+  }
+
+  .modal {
+    max-height: 85vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  /* Rate table inputs */
+  .rate-table input {
+    width: 100px;
+  }
+
+  /* Currency description wrapping */
+  .settings-description {
+    word-break: break-word;
+  }
+}

@@ -1,36 +1,38 @@
 import { getSnapshots, getSettings } from '../store.js';
 import { formatCurrency } from '../components/currency.js';
+import { t, getDateLocale } from '../i18n.js';
 
 let chartInstance = null;
 
 export function render() {
   const snapshots = getSnapshots().reverse(); // oldest first for chart
   const settings = getSettings();
+  const locale = getDateLocale();
 
   if (snapshots.length < 2) {
     return `
       <div class="view-header">
-        <h1>Trends</h1>
+        <h1>${t('trends.title')}</h1>
       </div>
       <div class="empty-state">
         <div class="empty-state-icon">📈</div>
-        <h3>Not enough data</h3>
-        <p>Take at least 2 monthly snapshots to see your net worth trend.</p>
-        <a href="#/snapshots" class="btn btn-primary">Go to Snapshots</a>
+        <h3>${t('trends.notEnoughData')}</h3>
+        <p>${t('trends.takeMoreSnapshots')}</p>
+        <a href="#/snapshots" class="btn btn-primary">${t('trends.goToSnapshots')}</a>
       </div>
     `;
   }
 
   return `
     <div class="view-header">
-      <h1>Trends</h1>
+      <h1>${t('trends.title')}</h1>
     </div>
 
     <div class="card chart-card">
-      <h3 class="card-title">Net Worth Over Time</h3>
+      <h3 class="card-title">${t('trends.netWorthOverTime')}</h3>
       <div class="trend-controls">
-        <button class="trend-btn trend-btn--active" data-mode="net">Net Worth</button>
-        <button class="trend-btn" data-mode="all">Assets & Liabilities</button>
+        <button class="trend-btn trend-btn--active" data-mode="net">${t('trends.netWorth')}</button>
+        <button class="trend-btn" data-mode="all">${t('trends.assetsAndLiabilities')}</button>
       </div>
       <div class="chart-container" style="height: 320px;">
         <canvas id="trend-chart"></canvas>
@@ -38,22 +40,22 @@ export function render() {
     </div>
 
     <div class="card" style="margin-top: var(--space-md);">
-      <h3 class="card-title">History</h3>
+      <h3 class="card-title">${t('trends.history')}</h3>
       <table style="width:100%; border-collapse:collapse;">
         <thead>
           <tr style="font-size:var(--font-size-sm); color:var(--color-text-secondary);">
-            <th style="text-align:left; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">Month</th>
-            <th style="text-align:right; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">Assets</th>
-            <th style="text-align:right; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">Liabilities</th>
-            <th style="text-align:right; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">Net Worth</th>
-            <th style="text-align:right; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">Change</th>
+            <th style="text-align:left; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">${t('trends.month')}</th>
+            <th style="text-align:right; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">${t('trends.assets')}</th>
+            <th style="text-align:right; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">${t('trends.liabilities')}</th>
+            <th style="text-align:right; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">${t('trends.netWorth')}</th>
+            <th style="text-align:right; padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border);">${t('trends.change')}</th>
           </tr>
         </thead>
         <tbody>
           ${[...snapshots].reverse().map((snap, i, arr) => {
             const prev = arr[i + 1];
             const date = new Date(snap.date + 'T00:00:00');
-            const dateStr = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            const dateStr = date.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
             let changeStr = '—';
             let changeClass = '';
             if (prev) {
@@ -98,19 +100,20 @@ function renderTrendChart(canvas, mode) {
 
   const snapshots = getSnapshots().reverse();
   const settings = getSettings();
+  const locale = getDateLocale();
   const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text').trim();
   const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim();
 
   const labels = snapshots.map(s => {
     const d = new Date(s.date + 'T00:00:00');
-    return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    return d.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
   });
 
   const datasets = [];
 
   if (mode === 'net' || mode === 'all') {
     datasets.push({
-      label: 'Net Worth',
+      label: t('trends.netWorth'),
       data: snapshots.map(s => s.netWorth),
       borderColor: '#0071e3',
       backgroundColor: 'rgba(0, 113, 227, 0.1)',
@@ -123,7 +126,7 @@ function renderTrendChart(canvas, mode) {
 
   if (mode === 'all') {
     datasets.push({
-      label: 'Assets',
+      label: t('trends.assets'),
       data: snapshots.map(s => s.totalAssets),
       borderColor: '#34c759',
       backgroundColor: 'transparent',
@@ -132,7 +135,7 @@ function renderTrendChart(canvas, mode) {
       pointRadius: 3
     });
     datasets.push({
-      label: 'Liabilities',
+      label: t('trends.liabilities'),
       data: snapshots.map(s => s.totalLiabilities),
       borderColor: '#ff3b30',
       backgroundColor: 'transparent',

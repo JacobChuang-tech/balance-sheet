@@ -2,8 +2,15 @@ import { getSettings, updateSettings, exportData, importData, clearAllData, sync
 import { isSignedIn, getProfile, signIn, signOut } from '../gdrive.js';
 import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
+import { t, setLanguage, getDateLocale } from '../i18n.js';
+import { fetchAndSaveRates } from '../rates.js';
 
 const AVAILABLE_CURRENCIES = ['TWD', 'USD', 'EUR', 'JPY', 'GBP', 'HKD', 'CNY', 'KRW'];
+
+const AVAILABLE_LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'zh_TW', label: '繁體中文' }
+];
 
 export function render() {
   const settings = getSettings();
@@ -12,43 +19,43 @@ export function render() {
 
   return `
     <div class="view-header">
-      <h1>Settings</h1>
+      <h1>${t('settings.title')}</h1>
     </div>
 
     <div class="card settings-section">
-      <h3 class="settings-section-title">Cloud Sync</h3>
+      <h3 class="settings-section-title">${t('settings.cloudSync')}</h3>
       <div class="settings-row">
         <div>
-          <div class="settings-label">Google Drive Sync</div>
+          <div class="settings-label">${t('settings.googleDriveSync')}</div>
           <div class="settings-description">
             ${signedIn && profile
-              ? `Signed in as ${profile.email}. Data syncs automatically.`
-              : 'Sign in to sync data across devices via Google Drive.'}
+              ? t('settings.signedInAsTemplate', profile.email)
+              : t('settings.signInToSync')}
           </div>
         </div>
         ${signedIn
-          ? `<button class="btn btn-secondary" id="gdrive-signout">Sign Out</button>`
-          : `<button class="btn btn-primary" id="gdrive-signin">Sign in with Google</button>`
+          ? `<button class="btn btn-secondary" id="gdrive-signout">${t('settings.signOut')}</button>`
+          : `<button class="btn btn-primary" id="gdrive-signin">${t('settings.signInWithGoogle')}</button>`
         }
       </div>
       ${signedIn ? `
         <div class="settings-row">
           <div>
-            <div class="settings-label">Sync Now</div>
-            <div class="settings-description">Pull latest data from Google Drive</div>
+            <div class="settings-label">${t('settings.syncNow')}</div>
+            <div class="settings-description">${t('settings.pullLatestData')}</div>
           </div>
-          <button class="btn btn-secondary" id="gdrive-sync">Sync</button>
+          <button class="btn btn-secondary" id="gdrive-sync">${t('settings.sync')}</button>
         </div>
       ` : ''}
     </div>
 
     <div class="card settings-section">
-      <h3 class="settings-section-title">Display</h3>
+      <h3 class="settings-section-title">${t('settings.display')}</h3>
 
       <div class="settings-row">
         <div>
-          <div class="settings-label">Base Currency</div>
-          <div class="settings-description">Net worth displayed in this currency</div>
+          <div class="settings-label">${t('settings.baseCurrency')}</div>
+          <div class="settings-description">${t('settings.netWorthDisplayedIn')}</div>
         </div>
         <select id="base-currency" style="width:100px;">
           ${settings.currencies.map(c => `<option value="${c}" ${c === settings.baseCurrency ? 'selected' : ''}>${c}</option>`).join('')}
@@ -57,24 +64,34 @@ export function render() {
 
       <div class="settings-row">
         <div>
-          <div class="settings-label">Dark Mode</div>
-          <div class="settings-description">Switch to dark theme</div>
+          <div class="settings-label">${t('settings.darkMode')}</div>
+          <div class="settings-description">${t('settings.switchToDarkTheme')}</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="dark-mode-toggle" ${settings.darkMode ? 'checked' : ''}>
           <span class="toggle-track"></span>
         </label>
       </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">${t('settings.language')}</div>
+          <div class="settings-description">${t('settings.selectLanguage')}</div>
+        </div>
+        <select id="language-select" style="width:140px;">
+          ${AVAILABLE_LANGUAGES.map(l => `<option value="${l.code}" ${(settings.language || 'en') === l.code ? 'selected' : ''}>${l.label}</option>`).join('')}
+        </select>
+      </div>
     </div>
 
     <div class="card settings-section">
-      <h3 class="settings-section-title">Currencies</h3>
+      <h3 class="settings-section-title">${t('settings.currencies')}</h3>
       <p class="settings-description" style="margin-bottom: var(--space-md);">
-        Enable currencies and set exchange rates relative to ${settings.baseCurrency}.
+        ${t('settings.enableCurrenciesDescTemplate', settings.baseCurrency)}
       </p>
 
       <div style="margin-bottom: var(--space-md);">
-        <label class="form-label">Enabled Currencies</label>
+        <label class="form-label">${t('settings.enabledCurrencies')}</label>
         <div style="display:flex; flex-wrap:wrap; gap:var(--space-sm); margin-top:var(--space-xs);">
           ${AVAILABLE_CURRENCIES.map(c => `
             <label style="display:flex; align-items:center; gap:var(--space-xs); cursor:pointer;">
@@ -90,8 +107,8 @@ export function render() {
       <table class="rate-table" id="rate-table">
         <thead>
           <tr>
-            <th>Currency</th>
-            <th>1 unit = ? ${settings.baseCurrency}</th>
+            <th>${t('settings.currency')}</th>
+            <th>${t('settings.exchangeRateHeaderTemplate', settings.baseCurrency)}</th>
           </tr>
         </thead>
         <tbody>
@@ -105,37 +122,45 @@ export function render() {
             `).join('')}
         </tbody>
       </table>
-      <button class="btn btn-secondary" id="save-rates" style="margin-top:var(--space-md);">Save Rates</button>
+      <div style="display:flex; gap:var(--space-sm); align-items:center; flex-wrap:wrap; margin-top:var(--space-md);">
+        <button class="btn btn-secondary" id="save-rates">${t('settings.saveRates')}</button>
+        <button class="btn btn-primary" id="fetch-rates">${t('settings.fetchRates')}</button>
+      </div>
+      <p class="settings-description" style="margin-top:var(--space-sm);">
+        ${settings.ratesLastFetched
+          ? t('settings.ratesAutoUpdate', new Date(settings.ratesLastFetched).toLocaleDateString(getDateLocale(), { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }))
+          : t('settings.ratesNeverFetched')}
+      </p>
     </div>
 
     <div class="card settings-section">
-      <h3 class="settings-section-title">Data</h3>
+      <h3 class="settings-section-title">${t('settings.data')}</h3>
 
       <div class="settings-row">
         <div>
-          <div class="settings-label">Export Data</div>
-          <div class="settings-description">Download all data as JSON file</div>
+          <div class="settings-label">${t('settings.exportData')}</div>
+          <div class="settings-description">${t('settings.downloadAsJson')}</div>
         </div>
-        <button class="btn btn-secondary" id="export-btn">Export</button>
+        <button class="btn btn-secondary" id="export-btn">${t('settings.export')}</button>
       </div>
 
       <div class="settings-row">
         <div>
-          <div class="settings-label">Import Data</div>
-          <div class="settings-description">Restore from a JSON backup (replaces current data)</div>
+          <div class="settings-label">${t('settings.importData')}</div>
+          <div class="settings-description">${t('settings.restoreFromBackup')}</div>
         </div>
         <div>
           <input type="file" id="import-input" accept=".json" style="display:none;">
-          <button class="btn btn-secondary" id="import-btn">Import</button>
+          <button class="btn btn-secondary" id="import-btn">${t('settings.import')}</button>
         </div>
       </div>
 
       <div class="settings-row">
         <div>
-          <div class="settings-label">Clear All Data</div>
-          <div class="settings-description">Delete all accounts, snapshots, and settings</div>
+          <div class="settings-label">${t('settings.clearAllData')}</div>
+          <div class="settings-description">${t('settings.deleteAllDesc')}</div>
         </div>
-        <button class="btn btn-danger" id="clear-btn">Clear</button>
+        <button class="btn btn-danger" id="clear-btn">${t('settings.clear')}</button>
       </div>
     </div>
   `;
@@ -152,7 +177,7 @@ export function mount(container) {
   if (signoutBtn) {
     signoutBtn.addEventListener('click', () => {
       signOut();
-      showToast('Signed out from Google Drive');
+      showToast(t('toast.signedOutFromGoogle'));
       window.__rerender();
     });
   }
@@ -160,16 +185,16 @@ export function mount(container) {
   const syncBtn = container.querySelector('#gdrive-sync');
   if (syncBtn) {
     syncBtn.addEventListener('click', async () => {
-      syncBtn.textContent = 'Syncing...';
+      syncBtn.textContent = t('settings.syncing');
       syncBtn.disabled = true;
       const updated = await syncFromDrive();
       if (updated) {
-        showToast('Data synced from Google Drive');
+        showToast(t('toast.dataSyncedFromDrive'));
         window.__applyTheme();
         window.__rerender();
       } else {
-        showToast('Already up to date', 'info');
-        syncBtn.textContent = 'Sync';
+        showToast(t('toast.alreadyUpToDate'), 'info');
+        syncBtn.textContent = t('settings.sync');
         syncBtn.disabled = false;
       }
     });
@@ -178,7 +203,7 @@ export function mount(container) {
   // Base currency
   container.querySelector('#base-currency').addEventListener('change', (e) => {
     updateSettings({ baseCurrency: e.target.value });
-    showToast('Base currency updated');
+    showToast(t('toast.baseCurrencyUpdated'));
     window.__rerender();
   });
 
@@ -186,7 +211,15 @@ export function mount(container) {
   container.querySelector('#dark-mode-toggle').addEventListener('change', (e) => {
     updateSettings({ darkMode: e.target.checked });
     window.__applyTheme();
-    showToast(e.target.checked ? 'Dark mode on' : 'Dark mode off');
+    showToast(e.target.checked ? t('toast.darkModeOn') : t('toast.darkModeOff'));
+  });
+
+  // Language selector
+  container.querySelector('#language-select').addEventListener('change', (e) => {
+    const lang = e.target.value;
+    updateSettings({ language: lang });
+    setLanguage(lang);
+    window.__rerender();
   });
 
   // Currency checkboxes
@@ -208,7 +241,23 @@ export function mount(container) {
       rates[input.dataset.currency] = parseFloat(input.value) || 1;
     });
     updateSettings({ exchangeRates: rates });
-    showToast('Exchange rates saved');
+    showToast(t('toast.exchangeRatesSaved'));
+  });
+
+  // Fetch live rates
+  container.querySelector('#fetch-rates').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.textContent = t('settings.fetchingRates');
+    btn.disabled = true;
+    try {
+      await fetchAndSaveRates();
+      showToast(t('toast.ratesFetched'));
+      window.__rerender();
+    } catch (err) {
+      showToast(t('toast.ratesFetchFailed'), 'error');
+      btn.textContent = t('settings.fetchRates');
+      btn.disabled = false;
+    }
   });
 
   // Export
@@ -221,7 +270,7 @@ export function mount(container) {
     a.download = `balance-sheet-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Data exported');
+    showToast(t('toast.dataExported'));
   });
 
   // Import
@@ -236,11 +285,11 @@ export function mount(container) {
     reader.onload = () => {
       try {
         importData(reader.result);
-        showToast('Data imported successfully');
+        showToast(t('toast.dataImported'));
         window.__applyTheme();
         window.__rerender();
       } catch (err) {
-        showToast('Invalid file format', 'error');
+        showToast(t('toast.invalidFileFormat'), 'error');
       }
     };
     reader.readAsText(file);
@@ -249,18 +298,18 @@ export function mount(container) {
   // Clear
   container.querySelector('#clear-btn').addEventListener('click', () => {
     const body = `
-      <p>This will permanently delete all accounts, snapshots, and settings. Are you sure?</p>
+      <p>${t('settings.clearConfirm')}</p>
       <div class="form-actions" style="margin-top: var(--space-lg);">
-        <button class="btn btn-secondary" id="cancel-clear">Cancel</button>
-        <button class="btn btn-danger" id="confirm-clear">Delete Everything</button>
+        <button class="btn btn-secondary" id="cancel-clear">${t('accounts.cancel')}</button>
+        <button class="btn btn-danger" id="confirm-clear">${t('settings.deleteEverything')}</button>
       </div>
     `;
-    openModal({ title: 'Clear All Data', body });
+    openModal({ title: t('settings.clearAllDataTitle'), body });
 
     document.getElementById('cancel-clear').addEventListener('click', closeModal);
     document.getElementById('confirm-clear').addEventListener('click', () => {
       clearAllData();
-      showToast('All data cleared');
+      showToast(t('toast.allDataCleared'));
       closeModal();
       window.__applyTheme();
       window.location.hash = '#/dashboard';

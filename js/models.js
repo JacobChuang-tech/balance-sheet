@@ -1,3 +1,5 @@
+import { t } from './i18n.js';
+
 export const ASSET_CATEGORIES = [
   { key: 'cash', label: 'Cash & Bank', icon: '🏦' },
   { key: 'investments', label: 'Investments', icon: '📈' },
@@ -15,7 +17,8 @@ export const LIABILITY_CATEGORIES = [
 export const ALL_CATEGORIES = [...ASSET_CATEGORIES, ...LIABILITY_CATEGORIES];
 
 export function getCategoryInfo(key) {
-  return ALL_CATEGORIES.find(c => c.key === key) || { key, label: key, icon: '📦' };
+  const cat = ALL_CATEGORIES.find(c => c.key === key) || { key, icon: '📦' };
+  return { ...cat, label: t('category.' + key) || cat.label || key };
 }
 
 export function getCategoryType(categoryKey) {
@@ -106,7 +109,8 @@ export const EXPENSE_CATEGORIES = [
 export const ALL_PNL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
 export function getPnlCategoryInfo(key) {
-  return ALL_PNL_CATEGORIES.find(c => c.key === key) || { key, label: key, icon: '📦' };
+  const cat = ALL_PNL_CATEGORIES.find(c => c.key === key) || { key, icon: '📦' };
+  return { ...cat, label: t('category.' + key) || cat.label || key };
 }
 
 export function createTransaction({ type, category, amount, currency, description = '', date }) {

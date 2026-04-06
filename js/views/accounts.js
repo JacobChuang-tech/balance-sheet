@@ -3,6 +3,7 @@ import { ASSET_CATEGORIES, LIABILITY_CATEGORIES, getCategoryInfo, getCategoryTyp
 import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { formatCurrency } from '../components/currency.js';
+import { t } from '../i18n.js';
 
 export function render() {
   const accounts = getAccounts();
@@ -22,26 +23,26 @@ export function render() {
 
   return `
     <div class="view-header">
-      <h1>Accounts</h1>
-      <button class="btn btn-primary" id="add-account-btn">+ Add Account</button>
+      <h1>${t('accounts.title')}</h1>
+      <button class="btn btn-primary" id="add-account-btn">${t('accounts.addAccount')}</button>
     </div>
 
     ${!hasAccounts ? `
       <div class="empty-state">
         <div class="empty-state-icon">📊</div>
-        <h3>No accounts yet</h3>
-        <p>Add your first account to start tracking your net worth.</p>
-        <button class="btn btn-primary" id="add-account-btn-empty">+ Add Account</button>
+        <h3>${t('accounts.noAccountsYet')}</h3>
+        <p>${t('accounts.addFirstAccount')}</p>
+        <button class="btn btn-primary" id="add-account-btn-empty">${t('accounts.addAccount')}</button>
       </div>
     ` : ''}
 
     ${assetGroups.length > 0 ? `
-      <div class="section-label">Assets</div>
+      <div class="section-label">${t('accounts.assets')}</div>
       ${assetGroups.map(group => renderGroup(group, settings)).join('')}
     ` : ''}
 
     ${liabilityGroups.length > 0 ? `
-      <div class="section-label">Liabilities</div>
+      <div class="section-label">${t('accounts.liabilities')}</div>
       ${liabilityGroups.map(group => renderGroup(group, settings)).join('')}
     ` : ''}
   `;
@@ -52,7 +53,7 @@ function renderGroup(group, settings) {
     <div class="card account-group">
       <div class="account-group-header">
         <span class="account-group-icon">${group.icon}</span>
-        <span class="account-group-label">${group.label}</span>
+        <span class="account-group-label">${t('category.' + group.key)}</span>
         <span class="account-group-count">${group.accounts.length}</span>
       </div>
       <div class="account-list">
@@ -74,10 +75,10 @@ function renderAccountItem(acc, settings) {
         ${acc.currency !== settings.baseCurrency ? `<span class="account-item-currency">${acc.currency}</span>` : ''}
       </div>
       <div class="account-item-actions">
-        <button class="btn-icon edit-account" data-id="${acc.id}" aria-label="Edit">
+        <button class="btn-icon edit-account" data-id="${acc.id}" aria-label="${t('accounts.editAccountTitle')}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
-        <button class="btn-icon delete-account" data-id="${acc.id}" aria-label="Delete">
+        <button class="btn-icon delete-account" data-id="${acc.id}" aria-label="${t('accounts.deleteAccountTitle')}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
       </div>
@@ -113,47 +114,45 @@ export function mount(container) {
 function openAccountModal(existing = null) {
   const settings = getSettings();
   const isEdit = !!existing;
-  const title = isEdit ? 'Edit Account' : 'Add Account';
-
-  const allCats = [...ASSET_CATEGORIES, ...LIABILITY_CATEGORIES];
+  const title = isEdit ? t('accounts.editAccountTitle') : t('accounts.addAccountTitle');
 
   const body = document.createElement('div');
   body.innerHTML = `
     <form id="account-form" class="form">
       <div class="form-group">
-        <label class="form-label" for="acc-name">Name</label>
-        <input type="text" id="acc-name" placeholder="e.g. Chase Checking" value="${existing?.name || ''}" required>
+        <label class="form-label" for="acc-name">${t('accounts.name')}</label>
+        <input type="text" id="acc-name" placeholder="${t('accounts.namePlaceholder')}" value="${existing?.name || ''}" required>
       </div>
       <div class="form-group">
-        <label class="form-label" for="acc-category">Category</label>
+        <label class="form-label" for="acc-category">${t('accounts.category')}</label>
         <select id="acc-category">
-          <optgroup label="Assets">
-            ${ASSET_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('')}
+          <optgroup label="${t('catgroup.assets')}">
+            ${ASSET_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
-          <optgroup label="Liabilities">
-            ${LIABILITY_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('')}
+          <optgroup label="${t('catgroup.liabilities')}">
+            ${LIABILITY_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
         </select>
       </div>
       <div class="form-row">
         <div class="form-group form-group--grow">
-          <label class="form-label" for="acc-balance">Balance</label>
+          <label class="form-label" for="acc-balance">${t('accounts.balance')}</label>
           <input type="number" id="acc-balance" step="0.01" placeholder="0" value="${existing?.balance || ''}" required>
         </div>
         <div class="form-group" style="width: 100px;">
-          <label class="form-label" for="acc-currency">Currency</label>
+          <label class="form-label" for="acc-currency">${t('accounts.currency')}</label>
           <select id="acc-currency">
             ${settings.currencies.map(c => `<option value="${c}" ${(existing?.currency || settings.baseCurrency) === c ? 'selected' : ''}>${c}</option>`).join('')}
           </select>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label" for="acc-note">Note (optional)</label>
-        <input type="text" id="acc-note" placeholder="Optional note" value="${existing?.note || ''}">
+        <label class="form-label" for="acc-note">${t('accounts.noteOptional')}</label>
+        <input type="text" id="acc-note" placeholder="${t('accounts.notePlaceholder')}" value="${existing?.note || ''}">
       </div>
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
-        <button type="submit" class="btn btn-primary">${isEdit ? 'Save Changes' : 'Add Account'}</button>
+        <button type="button" class="btn btn-secondary" id="cancel-btn">${t('accounts.cancel')}</button>
+        <button type="submit" class="btn btn-primary">${isEdit ? t('accounts.saveChanges') : t('accounts.addAccountTitle')}</button>
       </div>
     </form>
   `;
@@ -177,11 +176,11 @@ function openAccountModal(existing = null) {
 
     if (isEdit) {
       upsertAccount({ ...existing, name, type, category, balance, currency, note });
-      showToast('Account updated');
+      showToast(t('toast.accountUpdated'));
     } else {
       const acc = createAccount({ name, type, category, currency, balance, note });
       upsertAccount(acc);
-      showToast('Account added');
+      showToast(t('toast.accountAdded'));
     }
 
     closeModal();
@@ -191,20 +190,20 @@ function openAccountModal(existing = null) {
 
 function openDeleteConfirm(acc) {
   const body = `
-    <p>Delete <strong>${acc.name}</strong>?</p>
-    <p class="text-secondary">This won't affect past snapshots.</p>
+    <p>${t('accounts.deleteConfirmBody', acc.name)}</p>
+    <p class="text-secondary">${t('accounts.deleteConfirmDesc')}</p>
     <div class="form-actions" style="margin-top: var(--space-lg);">
-      <button class="btn btn-secondary" id="cancel-delete">Cancel</button>
-      <button class="btn btn-danger" id="confirm-delete">Delete</button>
+      <button class="btn btn-secondary" id="cancel-delete">${t('accounts.cancel')}</button>
+      <button class="btn btn-danger" id="confirm-delete">${t('accounts.delete')}</button>
     </div>
   `;
 
-  openModal({ title: 'Delete Account', body });
+  openModal({ title: t('accounts.deleteAccountTitle'), body });
 
   document.getElementById('cancel-delete').addEventListener('click', closeModal);
   document.getElementById('confirm-delete').addEventListener('click', () => {
     deleteAccount(acc.id);
-    showToast('Account deleted');
+    showToast(t('toast.accountDeleted'));
     closeModal();
     window.__rerender();
   });

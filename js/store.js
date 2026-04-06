@@ -8,7 +8,8 @@ const DEFAULT_DATA = {
     baseCurrency: 'TWD',
     currencies: ['TWD', 'USD'],
     exchangeRates: { USD: 32.15 },
-    darkMode: false
+    darkMode: false,
+    language: 'en'
   },
   accounts: [],
   snapshots: [],

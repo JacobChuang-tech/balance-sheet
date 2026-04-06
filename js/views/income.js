@@ -3,13 +3,14 @@ import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, getPnlCategoryInfo, createTransa
 import { formatCurrency } from '../components/currency.js';
 import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
+import { t, getDateLocale } from '../i18n.js';
 
 let currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
 
 function formatMonthLabel(ym) {
   const [y, m] = ym.split('-');
   const date = new Date(parseInt(y), parseInt(m) - 1);
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+  return date.toLocaleDateString(getDateLocale(), { year: 'numeric', month: 'long' });
 }
 
 function shiftMonth(ym, delta) {
@@ -34,8 +35,8 @@ export function render() {
 
   return `
     <div class="view-header">
-      <h1>Income & Expenses</h1>
-      <button class="btn btn-primary" id="add-txn-btn">+ Add Entry</button>
+      <h1>${t('income.title')}</h1>
+      <button class="btn btn-primary" id="add-txn-btn">${t('income.addEntry')}</button>
     </div>
 
     <div class="month-nav card">
@@ -51,15 +52,15 @@ export function render() {
     <div class="pnl-summary card">
       <div class="pnl-summary-row">
         <div class="pnl-summary-item">
-          <span class="pnl-summary-label">Income</span>
+          <span class="pnl-summary-label">${t('income.income')}</span>
           <span class="pnl-summary-value text-green">${formatCurrency(totalIncome, settings.baseCurrency)}</span>
         </div>
         <div class="pnl-summary-item">
-          <span class="pnl-summary-label">Expenses</span>
+          <span class="pnl-summary-label">${t('income.expenses')}</span>
           <span class="pnl-summary-value text-red">${formatCurrency(totalExpenses, settings.baseCurrency)}</span>
         </div>
         <div class="pnl-summary-item">
-          <span class="pnl-summary-label">Net Savings</span>
+          <span class="pnl-summary-label">${t('income.netSavings')}</span>
           <span class="pnl-summary-value ${netSavings >= 0 ? 'text-green' : 'text-red'}">${formatCurrency(netSavings, settings.baseCurrency)}</span>
         </div>
       </div>
@@ -68,22 +69,22 @@ export function render() {
           <div class="pnl-bar-income" style="width: ${totalIncome + totalExpenses > 0 ? (totalIncome / (totalIncome + totalExpenses) * 100) : 50}%"></div>
           <div class="pnl-bar-expense" style="width: ${totalIncome + totalExpenses > 0 ? (totalExpenses / (totalIncome + totalExpenses) * 100) : 50}%"></div>
         </div>
-        ${totalIncome > 0 ? `<div class="pnl-savings-rate">Savings rate: ${((netSavings / totalIncome) * 100).toFixed(1)}%</div>` : ''}
+        ${totalIncome > 0 ? `<div class="pnl-savings-rate">${t('income.savingsRateTemplate', ((netSavings / totalIncome) * 100).toFixed(1))}</div>` : ''}
       ` : ''}
     </div>
 
     ${txns.length === 0 ? `
       <div class="empty-state">
         <div class="empty-state-icon">💸</div>
-        <h3>No entries this month</h3>
-        <p>Add income and expenses to track your cash flow.</p>
-        <button class="btn btn-primary" id="add-txn-empty">+ Add Entry</button>
+        <h3>${t('income.noEntriesThisMonth')}</h3>
+        <p>${t('income.addIncomeAndExpenses')}</p>
+        <button class="btn btn-primary" id="add-txn-empty">${t('income.addEntry')}</button>
       </div>
     ` : `
       <div class="pnl-grid">
         <div class="card">
           <div class="pnl-section-header">
-            <h3 class="card-title">Income</h3>
+            <h3 class="card-title">${t('income.income')}</h3>
             <span class="text-green" style="font-weight:var(--font-weight-semibold);">${formatCurrency(totalIncome, settings.baseCurrency)}</span>
           </div>
           ${incomeByCategory.length > 0 ? `
@@ -96,15 +97,15 @@ export function render() {
                 </div>
               `).join('')}
             </div>
-          ` : '<p class="text-secondary" style="font-size:var(--font-size-sm);">No income entries</p>'}
+          ` : `<p class="text-secondary" style="font-size:var(--font-size-sm);">${t('income.noIncomeEntries')}</p>`}
           <div class="pnl-txn-list">
-            ${incomeTxns.map(t => renderTxnItem(t, settings)).join('')}
+            ${incomeTxns.map(txn => renderTxnItem(txn, settings)).join('')}
           </div>
         </div>
 
         <div class="card">
           <div class="pnl-section-header">
-            <h3 class="card-title">Expenses</h3>
+            <h3 class="card-title">${t('income.expenses')}</h3>
             <span class="text-red" style="font-weight:var(--font-weight-semibold);">${formatCurrency(totalExpenses, settings.baseCurrency)}</span>
           </div>
           ${expenseByCategory.length > 0 ? `
@@ -117,16 +118,16 @@ export function render() {
                 </div>
               `).join('')}
             </div>
-          ` : '<p class="text-secondary" style="font-size:var(--font-size-sm);">No expense entries</p>'}
+          ` : `<p class="text-secondary" style="font-size:var(--font-size-sm);">${t('income.noExpenseEntries')}</p>`}
           <div class="pnl-txn-list">
-            ${expenseTxns.map(t => renderTxnItem(t, settings)).join('')}
+            ${expenseTxns.map(txn => renderTxnItem(txn, settings)).join('')}
           </div>
         </div>
       </div>
 
       ${txns.length > 0 ? `
         <div class="card" style="margin-top:var(--space-lg);">
-          <h3 class="card-title">Income vs Expenses</h3>
+          <h3 class="card-title">${t('income.incomeVsExpenses')}</h3>
           <div class="chart-container">
             <canvas id="pnl-chart"></canvas>
           </div>
@@ -136,23 +137,23 @@ export function render() {
   `;
 }
 
-function renderTxnItem(t, settings) {
-  const cat = getPnlCategoryInfo(t.category);
+function renderTxnItem(txn, settings) {
+  const cat = getPnlCategoryInfo(txn.category);
   return `
-    <div class="pnl-txn-item" data-id="${t.id}">
+    <div class="pnl-txn-item" data-id="${txn.id}">
       <span class="pnl-txn-icon">${cat.icon}</span>
       <div class="pnl-txn-info">
-        <span class="pnl-txn-desc">${t.description || cat.label}</span>
-        <span class="pnl-txn-date">${t.date.slice(5)}</span>
+        <span class="pnl-txn-desc">${txn.description || cat.label}</span>
+        <span class="pnl-txn-date">${txn.date.slice(5)}</span>
       </div>
-      <span class="pnl-txn-amount ${t.type === 'income' ? 'text-green' : 'text-red'}">
-        ${t.type === 'expense' ? '-' : ''}${formatCurrency(t.amount, t.currency)}
+      <span class="pnl-txn-amount ${txn.type === 'income' ? 'text-green' : 'text-red'}">
+        ${txn.type === 'expense' ? '-' : ''}${formatCurrency(txn.amount, txn.currency)}
       </span>
       <div class="pnl-txn-actions">
-        <button class="btn-icon edit-txn" data-id="${t.id}" aria-label="Edit">
+        <button class="btn-icon edit-txn" data-id="${txn.id}" aria-label="${t('income.editEntryTitle')}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
-        <button class="btn-icon delete-txn" data-id="${t.id}" aria-label="Delete">
+        <button class="btn-icon delete-txn" data-id="${txn.id}" aria-label="${t('income.deleteEntryTitle')}">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
       </div>
@@ -162,13 +163,13 @@ function renderTxnItem(t, settings) {
 
 function groupByCategory(txns, settings) {
   const map = {};
-  for (const t of txns) {
-    const inBase = convertToBase(t.amount, t.currency, settings);
-    if (!map[t.category]) {
-      const info = getPnlCategoryInfo(t.category);
-      map[t.category] = { ...info, total: 0 };
+  for (const txn of txns) {
+    const inBase = convertToBase(txn.amount, txn.currency, settings);
+    if (!map[txn.category]) {
+      const info = getPnlCategoryInfo(txn.category);
+      map[txn.category] = { ...info, total: 0 };
     }
-    map[t.category].total += inBase;
+    map[txn.category].total += inBase;
   }
   return Object.values(map).sort((a, b) => b.total - a.total);
 }
@@ -199,7 +200,7 @@ export function mount(container) {
       e.stopPropagation();
       const id = btn.dataset.id;
       const txns = getTransactionsByMonth(currentMonth);
-      const txn = txns.find(t => t.id === id);
+      const txn = txns.find(tx => tx.id === id);
       if (txn) openTxnModal(txn, settings);
     });
   });
@@ -227,33 +228,33 @@ function openTxnModal(existing, settings) {
   body.innerHTML = `
     <form class="form" id="txn-form">
       <div class="form-group">
-        <label class="form-label">Type</label>
+        <label class="form-label">${t('income.form.type')}</label>
         <div class="pnl-type-toggle">
-          <button type="button" class="pnl-type-btn ${!existing || existing.type === 'expense' ? 'pnl-type-btn--active' : ''}" data-type="expense">Expense</button>
-          <button type="button" class="pnl-type-btn ${existing?.type === 'income' ? 'pnl-type-btn--active' : ''}" data-type="income">Income</button>
+          <button type="button" class="pnl-type-btn ${!existing || existing.type === 'expense' ? 'pnl-type-btn--active' : ''}" data-type="expense">${t('income.form.expense')}</button>
+          <button type="button" class="pnl-type-btn ${existing?.type === 'income' ? 'pnl-type-btn--active' : ''}" data-type="income">${t('income.form.income')}</button>
         </div>
         <input type="hidden" id="txn-type" value="${existing?.type || 'expense'}">
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="txn-category">Category</label>
+        <label class="form-label" for="txn-category">${t('income.form.category')}</label>
         <select id="txn-category" required>
-          <optgroup label="Expense" id="expense-opts">
-            ${EXPENSE_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('')}
+          <optgroup label="${t('catgroup.expense')}" id="expense-opts">
+            ${EXPENSE_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
-          <optgroup label="Income" id="income-opts">
-            ${INCOME_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('')}
+          <optgroup label="${t('catgroup.income')}" id="income-opts">
+            ${INCOME_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
         </select>
       </div>
 
       <div class="form-row">
         <div class="form-group form-group--grow">
-          <label class="form-label" for="txn-amount">Amount</label>
+          <label class="form-label" for="txn-amount">${t('income.form.amount')}</label>
           <input type="number" id="txn-amount" step="0.01" min="0" value="${existing?.amount || ''}" placeholder="0" required>
         </div>
         <div class="form-group">
-          <label class="form-label" for="txn-currency">Currency</label>
+          <label class="form-label" for="txn-currency">${t('income.form.currency')}</label>
           <select id="txn-currency" style="width:90px;">
             ${settings.currencies.map(c => `<option value="${c}" ${(existing?.currency || settings.baseCurrency) === c ? 'selected' : ''}>${c}</option>`).join('')}
           </select>
@@ -261,23 +262,23 @@ function openTxnModal(existing, settings) {
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="txn-date">Date</label>
+        <label class="form-label" for="txn-date">${t('income.form.date')}</label>
         <input type="date" id="txn-date" value="${defaultDate}" required>
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="txn-desc">Description (optional)</label>
-        <input type="text" id="txn-desc" value="${existing?.description || ''}" placeholder="e.g. Monthly rent">
+        <label class="form-label" for="txn-desc">${t('income.form.descriptionOptional')}</label>
+        <input type="text" id="txn-desc" value="${existing?.description || ''}" placeholder="${t('income.form.descPlaceholder')}">
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" id="txn-cancel">Cancel</button>
-        <button type="submit" class="btn btn-primary">${isEdit ? 'Save' : 'Add'}</button>
+        <button type="button" class="btn btn-secondary" id="txn-cancel">${t('income.form.cancel')}</button>
+        <button type="submit" class="btn btn-primary">${isEdit ? t('income.form.save') : t('income.form.add')}</button>
       </div>
     </form>
   `;
 
-  openModal({ title: isEdit ? 'Edit Entry' : 'Add Entry', body });
+  openModal({ title: isEdit ? t('income.editEntryTitle') : t('income.addEntryTitle'), body });
 
   // Type toggle logic
   const typeInput = document.getElementById('txn-type');
@@ -321,11 +322,11 @@ function openTxnModal(existing, settings) {
 
     if (isEdit) {
       upsertTransaction({ ...existing, ...data });
-      showToast('Entry updated');
+      showToast(t('toast.entryUpdated'));
     } else {
       const txn = createTransaction(data);
       upsertTransaction(txn);
-      showToast('Entry added');
+      showToast(t('toast.entryAdded'));
     }
 
     // Update currentMonth to match the transaction date
@@ -337,18 +338,18 @@ function openTxnModal(existing, settings) {
 
 function openDeleteConfirm(id) {
   const body = `
-    <p>Delete this entry? This cannot be undone.</p>
+    <p>${t('income.deleteConfirm')}</p>
     <div class="form-actions" style="margin-top: var(--space-lg);">
-      <button class="btn btn-secondary" id="cancel-del">Cancel</button>
-      <button class="btn btn-danger" id="confirm-del">Delete</button>
+      <button class="btn btn-secondary" id="cancel-del">${t('income.form.cancel')}</button>
+      <button class="btn btn-danger" id="confirm-del">${t('accounts.delete')}</button>
     </div>
   `;
-  openModal({ title: 'Delete Entry', body });
+  openModal({ title: t('income.deleteEntryTitle'), body });
 
   document.getElementById('cancel-del').addEventListener('click', closeModal);
   document.getElementById('confirm-del').addEventListener('click', () => {
     deleteTransaction(id);
-    showToast('Entry deleted');
+    showToast(t('toast.entryDeleted'));
     closeModal();
     window.__rerender();
   });
@@ -381,7 +382,7 @@ function renderPnlChart(canvas, settings) {
       labels,
       datasets: [
         {
-          label: 'Income',
+          label: t('income.income'),
           data: incomeData,
           backgroundColor: '#34c75980',
           borderColor: '#34c759',
@@ -389,7 +390,7 @@ function renderPnlChart(canvas, settings) {
           borderRadius: 4
         },
         {
-          label: 'Expenses',
+          label: t('income.expenses'),
           data: expenseData,
           backgroundColor: '#ff3b3080',
           borderColor: '#ff3b30',
