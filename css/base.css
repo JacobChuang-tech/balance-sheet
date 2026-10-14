@@ -9,6 +9,7 @@ html {
   font-size: var(--font-size-base);
   color: var(--color-text);
   background: var(--color-bg);
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

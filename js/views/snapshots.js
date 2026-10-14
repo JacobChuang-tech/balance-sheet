@@ -4,6 +4,7 @@ import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { formatCurrency } from '../components/currency.js';
 import { t, getDateLocale } from '../i18n.js';
+import { ICONS } from '../components/icons.js';
 
 export function render() {
   const settings = getSettings();
@@ -29,14 +30,14 @@ export function render() {
 
     ${accounts.length === 0 ? `
       <div class="empty-state">
-        <div class="empty-state-icon">📸</div>
+        <div class="empty-state-icon">${ICONS.camera}</div>
         <h3>${t('snapshots.noAccountsYet')}</h3>
         <p>${t('snapshots.addAccountsFirst')}</p>
         <a href="#/accounts" class="btn btn-primary">${t('dashboard.addAccount')}</a>
       </div>
     ` : snapshots.length === 0 ? `
       <div class="empty-state">
-        <div class="empty-state-icon">📸</div>
+        <div class="empty-state-icon">${ICONS.camera}</div>
         <h3>${t('snapshots.noSnapshotsYet')}</h3>
         <p>${t('snapshots.takeFirstSnapshot')}</p>
       </div>

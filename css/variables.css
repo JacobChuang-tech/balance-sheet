@@ -12,10 +12,10 @@
   --color-primary-hover: #0077ed;
   --color-primary-light: #e8f2ff;
 
-  --color-green: #34c759;
-  --color-green-light: #e8faf0;
-  --color-red: #ff3b30;
-  --color-red-light: #fff0ef;
+  --color-green: #2f8f5b;
+  --color-green-light: #e3f4ea;
+  --color-red: #c8553d;
+  --color-red-light: #fbece8;
   --color-orange: #ff9500;
   --color-yellow: #ffcc00;
   --color-purple: #af52de;
@@ -24,14 +24,26 @@
   --color-pink: #ff2d55;
 
   /* Category colors */
-  --color-cash: #34c759;
+  --color-cash: #2f8f5b;
   --color-investments: #0071e3;
   --color-fixed-assets: #af52de;
   --color-receivables: #ff9500;
   --color-other-assets: #5ac8fa;
-  --color-credit-cards: #ff3b30;
+  --color-credit-cards: #c8553d;
   --color-loans: #ff2d55;
   --color-other-liabilities: #ff9500;
+
+  /* Hero (net worth) card */
+  --color-hero-bg: #16181d;
+  --color-hero-border: transparent;
+  --color-hero-text: #f5f5f7;
+  --color-hero-text-secondary: #9a9ca3;
+  --color-hero-green: #7fd1a8;
+  --color-hero-red: #f09a85;
+
+  /* Sidebar */
+  --color-sidebar-bg: #fbfbfc;
+  --color-nav-active: rgba(0, 0, 0, 0.06);
 
   /* Spacing */
   --space-xs: 4px;
@@ -91,8 +103,16 @@
   --color-primary-hover: #409cff;
   --color-primary-light: #1c2b3d;
 
+  --color-green: #5cbf8a;
   --color-green-light: #1a2e1f;
+  --color-red: #e8735c;
   --color-red-light: #2e1a1a;
+
+  --color-hero-bg: #111214;
+  --color-hero-border: #3a3a3c;
+
+  --color-sidebar-bg: #232325;
+  --color-nav-active: rgba(255, 255, 255, 0.08);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);

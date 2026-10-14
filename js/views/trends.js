@@ -1,6 +1,7 @@
 import { getSnapshots, getSettings } from '../store.js';
 import { formatCurrency } from '../components/currency.js';
 import { t, getDateLocale } from '../i18n.js';
+import { ICONS } from '../components/icons.js';
 
 let chartInstance = null;
 
@@ -15,7 +16,7 @@ export function render() {
         <h1>${t('trends.title')}</h1>
       </div>
       <div class="empty-state">
-        <div class="empty-state-icon">📈</div>
+        <div class="empty-state-icon">${ICONS.trend}</div>
         <h3>${t('trends.notEnoughData')}</h3>
         <p>${t('trends.takeMoreSnapshots')}</p>
         <a href="#/snapshots" class="btn btn-primary">${t('trends.goToSnapshots')}</a>

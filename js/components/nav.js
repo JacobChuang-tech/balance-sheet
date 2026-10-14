@@ -1,4 +1,6 @@
 import { t } from '../i18n.js';
+import { getSettings, updateSettings } from '../store.js';
+import { ICONS } from './icons.js';
 
 function getNavItems() {
   return [
@@ -11,17 +13,32 @@ function getNavItems() {
   ];
 }
 
+const SIDEBAR_GROUPS = [
+  { key: 'nav.groupOverview', items: ['#/dashboard', '#/trends'] },
+  { key: 'nav.groupData', items: ['#/accounts', '#/snapshots', '#/income'] }
+];
+
+function renderNavItem(item, currentHash) {
+  const label = t(item.key);
+  const active = currentHash === item.hash || (currentHash === '' && item.hash === '#/dashboard');
+  return `
+    <a href="${item.hash}" class="nav-item ${active ? 'nav-item--active' : ''}" aria-label="${label}">
+      <span class="nav-icon">${item.icon}</span>
+      <span class="nav-label">${label}</span>
+    </a>
+  `;
+}
+
 function renderNavItems(currentHash) {
-  return getNavItems().map(item => {
-    const label = t(item.key);
-    const active = currentHash === item.hash || (currentHash === '' && item.hash === '#/dashboard');
-    return `
-      <a href="${item.hash}" class="nav-item ${active ? 'nav-item--active' : ''}" aria-label="${label}">
-        <span class="nav-icon">${item.icon}</span>
-        <span class="nav-label">${label}</span>
-      </a>
-    `;
-  }).join('');
+  return getNavItems().map(item => renderNavItem(item, currentHash)).join('');
+}
+
+function renderSidebarNav(currentHash) {
+  const byHash = Object.fromEntries(getNavItems().map(item => [item.hash, item]));
+  return SIDEBAR_GROUPS.map(group => `
+    <div class="sidebar-group-label">${t(group.key)}</div>
+    ${group.items.map(hash => renderNavItem(byHash[hash], currentHash)).join('')}
+  `).join('');
 }
 
 export function initNav() {
@@ -29,18 +46,34 @@ export function initNav() {
   window.addEventListener('hashchange', updateNav);
 }
 
+function toggleTheme() {
+  updateSettings({ darkMode: !getSettings().darkMode });
+  window.__applyTheme();
+  window.__rerender();
+}
+
 function updateNav() {
   const hash = window.location.hash || '#/dashboard';
   const sidebar = document.getElementById('sidebar');
   const bottombar = document.getElementById('bottombar');
+  const settingsItem = getNavItems().find(item => item.hash === '#/settings');
 
   const sidebarHTML = `
     <div class="sidebar-header">
+      <span class="sidebar-logo">${ICONS.logo}</span>
       <h2 class="sidebar-title">${t('app.title')}</h2>
     </div>
-    <div class="sidebar-nav">${renderNavItems(hash)}</div>
+    <div class="sidebar-nav">${renderSidebarNav(hash)}</div>
+    <div class="sidebar-footer">
+      ${renderNavItem(settingsItem, hash)}
+      <button type="button" class="sidebar-theme-toggle" id="sidebar-theme-toggle" aria-label="${t('nav.toggleTheme')}" title="${t('nav.toggleTheme')}">
+        <span class="theme-icon-light">${ICONS.moon}</span>
+        <span class="theme-icon-dark">${ICONS.sun}</span>
+      </button>
+    </div>
   `;
 
   sidebar.innerHTML = sidebarHTML;
+  sidebar.querySelector('#sidebar-theme-toggle').addEventListener('click', toggleTheme);
   bottombar.innerHTML = renderNavItems(hash);
 }

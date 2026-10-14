@@ -13,6 +13,9 @@ const translations = {
     'nav.income': 'Income',
     'nav.trends': 'Trends',
     'nav.settings': 'Settings',
+    'nav.groupOverview': 'Overview',
+    'nav.groupData': 'Data',
+    'nav.toggleTheme': 'Toggle dark mode',
 
     // Dashboard
     'dashboard.title': 'Dashboard',
@@ -26,6 +29,13 @@ const translations = {
     'dashboard.getStarted': 'Get started',
     'dashboard.addAccountsToSee': 'Add your accounts to see your net worth.',
     'dashboard.addAccount': '+ Add Account',
+    'dashboard.debtRatioTemplate': 'Liabilities are %s of assets',
+    'onboarding.title': 'Set up your balance sheet in 3 steps',
+    'onboarding.subtitle': 'Once done, you can track your net worth over time.',
+    'onboarding.step1': 'Add your first account',
+    'onboarding.step2': 'Take your first snapshot',
+    'onboarding.step3': 'Take a second snapshot to unlock trends',
+    'onboarding.go': 'Start',
 
     // Accounts
     'accounts.title': 'Accounts',
@@ -222,6 +232,9 @@ const translations = {
     'nav.income': '收支',
     'nav.trends': '趨勢',
     'nav.settings': '設定',
+    'nav.groupOverview': '總覽',
+    'nav.groupData': '資料',
+    'nav.toggleTheme': '切換深色模式',
 
     // Dashboard
     'dashboard.title': '儀表板',
@@ -235,6 +248,13 @@ const translations = {
     'dashboard.getStarted': '開始使用',
     'dashboard.addAccountsToSee': '新增帳戶以查看您的淨資產。',
     'dashboard.addAccount': '+ 新增帳戶',
+    'dashboard.debtRatioTemplate': '負債佔資產 %s',
+    'onboarding.title': '三步建立你的資產負債表',
+    'onboarding.subtitle': '完成後就能追蹤淨資產的變化。',
+    'onboarding.step1': '新增第一個帳戶',
+    'onboarding.step2': '建立第一張快照',
+    'onboarding.step3': '再建立一張快照，解鎖趨勢圖',
+    'onboarding.go': '開始',
 
     // Accounts
     'accounts.title': '帳戶',

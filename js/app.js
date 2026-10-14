@@ -3,6 +3,7 @@ import { getSettings, syncFromDrive } from './store.js';
 import { initGoogleAuth, onSignInChange } from './gdrive.js';
 import { setLanguage, t } from './i18n.js';
 import { autoRefreshIfStale } from './rates.js';
+import { ICONS } from './components/icons.js';
 
 const views = {};
 
@@ -47,7 +48,7 @@ async function render() {
     app.classList.remove('view-loading');
     app.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state-icon">🚧</div>
+        <div class="empty-state-icon">${ICONS.compass}</div>
         <h3>${t('error.viewNotFound')}</h3>
         <p>${t('error.pageDoesntExist', route)}</p>
         <a href="#/dashboard" class="btn btn-primary">${t('error.goToDashboard')}</a>

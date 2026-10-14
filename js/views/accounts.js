@@ -4,6 +4,7 @@ import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { formatCurrency } from '../components/currency.js';
 import { t } from '../i18n.js';
+import { ICONS } from '../components/icons.js';
 
 export function render() {
   const accounts = getAccounts();
@@ -29,7 +30,7 @@ export function render() {
 
     ${!hasAccounts ? `
       <div class="empty-state">
-        <div class="empty-state-icon">📊</div>
+        <div class="empty-state-icon">${ICONS.wallet}</div>
         <h3>${t('accounts.noAccountsYet')}</h3>
         <p>${t('accounts.addFirstAccount')}</p>
         <button class="btn btn-primary" id="add-account-btn-empty">${t('accounts.addAccount')}</button>

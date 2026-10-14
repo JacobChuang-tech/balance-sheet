@@ -4,6 +4,7 @@ import { formatCurrency } from '../components/currency.js';
 import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { t, getDateLocale } from '../i18n.js';
+import { ICONS } from '../components/icons.js';
 
 let currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
 
@@ -75,7 +76,7 @@ export function render() {
 
     ${txns.length === 0 ? `
       <div class="empty-state">
-        <div class="empty-state-icon">💸</div>
+        <div class="empty-state-icon">${ICONS.coins}</div>
         <h3>${t('income.noEntriesThisMonth')}</h3>
         <p>${t('income.addIncomeAndExpenses')}</p>
         <button class="btn btn-primary" id="add-txn-empty">${t('income.addEntry')}</button>
