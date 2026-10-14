@@ -345,7 +345,7 @@
 }
 
 .account-group-icon {
-  font-size: 18px;
+  display: flex;
 }
 
 .account-group-label {
@@ -452,9 +452,25 @@
 }
 
 .category-icon {
-  font-size: 18px;
+  display: flex;
+}
+
+/* Category tile: colored rounded square with a white line icon */
+.cat-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 28px;
-  text-align: center;
+  height: 28px;
+  border-radius: 8px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.cat-tile svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
 }
 
 .category-name {
@@ -486,9 +502,20 @@
 }
 
 .account-summary-icon {
-  font-size: 16px;
+  display: flex;
+}
+
+.account-summary-icon .cat-tile,
+.pnl-txn-icon .cat-tile {
   width: 24px;
-  text-align: center;
+  height: 24px;
+  border-radius: 7px;
+}
+
+.account-summary-icon .cat-tile svg,
+.pnl-txn-icon .cat-tile svg {
+  width: 14px;
+  height: 14px;
 }
 
 .account-summary-name {
@@ -916,9 +943,7 @@
 }
 
 .pnl-txn-icon {
-  font-size: 16px;
-  width: 24px;
-  text-align: center;
+  display: flex;
   flex-shrink: 0;
 }
 

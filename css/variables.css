@@ -30,8 +30,9 @@
   --color-receivables: #ff9500;
   --color-other-assets: #5ac8fa;
   --color-credit-cards: #c8553d;
-  --color-loans: #ff2d55;
-  --color-other-liabilities: #ff9500;
+  --color-loans: #a8432f;
+  --color-other-liabilities: #d9826d;
+  --color-expense: #5b6b82;
 
   /* Hero (net worth) card */
   --color-hero-bg: #16181d;

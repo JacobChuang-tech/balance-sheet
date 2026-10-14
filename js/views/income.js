@@ -4,7 +4,7 @@ import { formatCurrency } from '../components/currency.js';
 import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { t, getDateLocale } from '../i18n.js';
-import { ICONS } from '../components/icons.js';
+import { ICONS, categoryTile } from '../components/icons.js';
 
 let currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
 
@@ -92,7 +92,7 @@ export function render() {
             <div class="pnl-category-list">
               ${incomeByCategory.map(cat => `
                 <div class="pnl-category-row">
-                  <span class="category-icon">${cat.icon}</span>
+                  <span class="category-icon">${categoryTile(cat)}</span>
                   <span class="category-name">${cat.label}</span>
                   <span class="category-amount text-green">${formatCurrency(cat.total, settings.baseCurrency)}</span>
                 </div>
@@ -113,7 +113,7 @@ export function render() {
             <div class="pnl-category-list">
               ${expenseByCategory.map(cat => `
                 <div class="pnl-category-row">
-                  <span class="category-icon">${cat.icon}</span>
+                  <span class="category-icon">${categoryTile(cat)}</span>
                   <span class="category-name">${cat.label}</span>
                   <span class="category-amount text-red">${formatCurrency(cat.total, settings.baseCurrency)}</span>
                 </div>
@@ -142,7 +142,7 @@ function renderTxnItem(txn, settings) {
   const cat = getPnlCategoryInfo(txn.category);
   return `
     <div class="pnl-txn-item" data-id="${txn.id}">
-      <span class="pnl-txn-icon">${cat.icon}</span>
+      <span class="pnl-txn-icon">${categoryTile(cat)}</span>
       <div class="pnl-txn-info">
         <span class="pnl-txn-desc">${txn.description || cat.label}</span>
         <span class="pnl-txn-date">${txn.date.slice(5)}</span>
@@ -241,10 +241,10 @@ function openTxnModal(existing, settings) {
         <label class="form-label" for="txn-category">${t('income.form.category')}</label>
         <select id="txn-category" required>
           <optgroup label="${t('catgroup.expense')}" id="expense-opts">
-            ${EXPENSE_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${t('category.' + c.key)}</option>`).join('')}
+            ${EXPENSE_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
           <optgroup label="${t('catgroup.income')}" id="income-opts">
-            ${INCOME_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${t('category.' + c.key)}</option>`).join('')}
+            ${INCOME_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
         </select>
       </div>
@@ -385,16 +385,16 @@ function renderPnlChart(canvas, settings) {
         {
           label: t('income.income'),
           data: incomeData,
-          backgroundColor: '#34c75980',
-          borderColor: '#34c759',
+          backgroundColor: '#2f8f5b80',
+          borderColor: '#2f8f5b',
           borderWidth: 1,
           borderRadius: 4
         },
         {
           label: t('income.expenses'),
           data: expenseData,
-          backgroundColor: '#ff3b3080',
-          borderColor: '#ff3b30',
+          backgroundColor: '#c8553d80',
+          borderColor: '#c8553d',
           borderWidth: 1,
           borderRadius: 4
         }

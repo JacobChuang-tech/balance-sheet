@@ -4,7 +4,7 @@ import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { formatCurrency } from '../components/currency.js';
 import { t } from '../i18n.js';
-import { ICONS } from '../components/icons.js';
+import { ICONS, categoryTile } from '../components/icons.js';
 
 export function render() {
   const accounts = getAccounts();
@@ -53,7 +53,7 @@ function renderGroup(group, settings) {
   return `
     <div class="card account-group">
       <div class="account-group-header">
-        <span class="account-group-icon">${group.icon}</span>
+        <span class="account-group-icon">${categoryTile(group)}</span>
         <span class="account-group-label">${t('category.' + group.key)}</span>
         <span class="account-group-count">${group.accounts.length}</span>
       </div>
@@ -128,10 +128,10 @@ function openAccountModal(existing = null) {
         <label class="form-label" for="acc-category">${t('accounts.category')}</label>
         <select id="acc-category">
           <optgroup label="${t('catgroup.assets')}">
-            ${ASSET_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${t('category.' + c.key)}</option>`).join('')}
+            ${ASSET_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
           <optgroup label="${t('catgroup.liabilities')}">
-            ${LIABILITY_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${c.icon} ${t('category.' + c.key)}</option>`).join('')}
+            ${LIABILITY_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
         </select>
       </div>

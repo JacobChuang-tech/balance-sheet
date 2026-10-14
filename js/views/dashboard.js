@@ -1,7 +1,7 @@
 import { getAccounts, getSnapshots, calculateNetWorth, getSettings, convertToBase } from '../store.js';
 import { ASSET_CATEGORIES, LIABILITY_CATEGORIES, getCategoryInfo } from '../models.js';
 import { formatCurrency, getCurrencySymbol } from '../components/currency.js';
-import { ICONS } from '../components/icons.js';
+import { ICONS, categoryTile } from '../components/icons.js';
 import { t } from '../i18n.js';
 
 export function render() {
@@ -80,7 +80,7 @@ export function render() {
           <div class="category-breakdown">
             ${categoryData.map(cat => `
               <div class="category-row">
-                <span class="category-icon">${cat.icon}</span>
+                <span class="category-icon">${categoryTile(cat)}</span>
                 <span class="category-name">${cat.label}</span>
                 <span class="category-amount ${cat.type === 'liability' ? 'text-red' : ''}">${cat.type === 'liability' ? '-' : ''}${formatCurrency(cat.total, settings.baseCurrency)}</span>
               </div>
@@ -93,7 +93,7 @@ export function render() {
           <div class="account-summary-list">
             ${accounts.map(acc => `
               <div class="account-summary-item">
-                <span class="account-summary-icon">${getCategoryInfo(acc.category).icon}</span>
+                <span class="account-summary-icon">${categoryTile(getCategoryInfo(acc.category))}</span>
                 <span class="account-summary-name">${acc.name}</span>
                 <span class="account-summary-amount ${acc.type === 'liability' ? 'text-red' : ''}">${acc.type === 'liability' ? '-' : ''}${formatCurrency(acc.balance, acc.currency)}</span>
               </div>

@@ -1,23 +1,23 @@
 import { t } from './i18n.js';
 
 export const ASSET_CATEGORIES = [
-  { key: 'cash', label: 'Cash & Bank', icon: '🏦' },
-  { key: 'investments', label: 'Investments', icon: '📈' },
-  { key: 'fixed_assets', label: 'Fixed Assets', icon: '🏠' },
-  { key: 'receivables', label: 'Receivables', icon: '📋' },
-  { key: 'other_assets', label: 'Other Assets', icon: '💎' }
+  { key: 'cash', label: 'Cash & Bank', icon: 'bank', color: 'var(--color-cash)' },
+  { key: 'investments', label: 'Investments', icon: 'trend', color: 'var(--color-investments)' },
+  { key: 'fixed_assets', label: 'Fixed Assets', icon: 'home', color: 'var(--color-fixed-assets)' },
+  { key: 'receivables', label: 'Receivables', icon: 'clipboard', color: 'var(--color-receivables)' },
+  { key: 'other_assets', label: 'Other Assets', icon: 'gem', color: 'var(--color-other-assets)' }
 ];
 
 export const LIABILITY_CATEGORIES = [
-  { key: 'credit_cards', label: 'Credit Cards', icon: '💳' },
-  { key: 'loans', label: 'Loans', icon: '🏦' },
-  { key: 'other_liabilities', label: 'Other Liabilities', icon: '📄' }
+  { key: 'credit_cards', label: 'Credit Cards', icon: 'creditCard', color: 'var(--color-credit-cards)' },
+  { key: 'loans', label: 'Loans', icon: 'bank', color: 'var(--color-loans)' },
+  { key: 'other_liabilities', label: 'Other Liabilities', icon: 'fileText', color: 'var(--color-other-liabilities)' }
 ];
 
 export const ALL_CATEGORIES = [...ASSET_CATEGORIES, ...LIABILITY_CATEGORIES];
 
 export function getCategoryInfo(key) {
-  const cat = ALL_CATEGORIES.find(c => c.key === key) || { key, icon: '📦' };
+  const cat = ALL_CATEGORIES.find(c => c.key === key) || { key, icon: 'package', color: 'var(--color-text-muted)' };
   return { ...cat, label: t('category.' + key) || cat.label || key };
 }
 
@@ -86,30 +86,30 @@ export function createSnapshot(accounts, settings) {
 
 // Income & Expense categories
 export const INCOME_CATEGORIES = [
-  { key: 'salary', label: 'Salary', icon: '💰' },
-  { key: 'freelance', label: 'Freelance', icon: '💻' },
-  { key: 'investment_income', label: 'Investment Income', icon: '📈' },
-  { key: 'gifts_received', label: 'Gifts Received', icon: '🎁' },
-  { key: 'other_income', label: 'Other Income', icon: '💵' }
+  { key: 'salary', label: 'Salary', icon: 'briefcase', color: '#2f8f5b' },
+  { key: 'freelance', label: 'Freelance', icon: 'laptop', color: '#3e9f6c' },
+  { key: 'investment_income', label: 'Investment Income', icon: 'percent', color: '#4fae7d' },
+  { key: 'gifts_received', label: 'Gifts Received', icon: 'gift', color: '#60bd8e' },
+  { key: 'other_income', label: 'Other Income', icon: 'banknote', color: '#71cc9f' }
 ];
 
 export const EXPENSE_CATEGORIES = [
-  { key: 'housing', label: 'Housing', icon: '🏠' },
-  { key: 'food', label: 'Food & Dining', icon: '🍽️' },
-  { key: 'transportation', label: 'Transportation', icon: '🚗' },
-  { key: 'shopping', label: 'Shopping', icon: '🛍️' },
-  { key: 'entertainment', label: 'Entertainment', icon: '🎬' },
-  { key: 'healthcare', label: 'Healthcare', icon: '🏥' },
-  { key: 'education', label: 'Education', icon: '📚' },
-  { key: 'utilities', label: 'Utilities', icon: '⚡' },
-  { key: 'insurance', label: 'Insurance', icon: '🛡️' },
-  { key: 'other_expense', label: 'Other Expense', icon: '📦' }
+  { key: 'housing', label: 'Housing', icon: 'home', color: 'var(--color-expense)' },
+  { key: 'food', label: 'Food & Dining', icon: 'utensils', color: 'var(--color-expense)' },
+  { key: 'transportation', label: 'Transportation', icon: 'car', color: 'var(--color-expense)' },
+  { key: 'shopping', label: 'Shopping', icon: 'bag', color: 'var(--color-expense)' },
+  { key: 'entertainment', label: 'Entertainment', icon: 'film', color: 'var(--color-expense)' },
+  { key: 'healthcare', label: 'Healthcare', icon: 'heartPulse', color: 'var(--color-expense)' },
+  { key: 'education', label: 'Education', icon: 'book', color: 'var(--color-expense)' },
+  { key: 'utilities', label: 'Utilities', icon: 'bolt', color: 'var(--color-expense)' },
+  { key: 'insurance', label: 'Insurance', icon: 'shield', color: 'var(--color-expense)' },
+  { key: 'other_expense', label: 'Other Expense', icon: 'package', color: 'var(--color-expense)' }
 ];
 
 export const ALL_PNL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
 export function getPnlCategoryInfo(key) {
-  const cat = ALL_PNL_CATEGORIES.find(c => c.key === key) || { key, icon: '📦' };
+  const cat = ALL_PNL_CATEGORIES.find(c => c.key === key) || { key, icon: 'package', color: 'var(--color-text-muted)' };
   return { ...cat, label: t('category.' + key) || cat.label || key };
 }
 

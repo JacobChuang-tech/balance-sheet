@@ -129,7 +129,7 @@ function renderTrendChart(canvas, mode) {
     datasets.push({
       label: t('trends.assets'),
       data: snapshots.map(s => s.totalAssets),
-      borderColor: '#34c759',
+      borderColor: '#2f8f5b',
       backgroundColor: 'transparent',
       borderDash: [5, 5],
       tension: 0.3,
@@ -138,7 +138,7 @@ function renderTrendChart(canvas, mode) {
     datasets.push({
       label: t('trends.liabilities'),
       data: snapshots.map(s => s.totalLiabilities),
-      borderColor: '#ff3b30',
+      borderColor: '#c8553d',
       backgroundColor: 'transparent',
       borderDash: [5, 5],
       tension: 0.3,
