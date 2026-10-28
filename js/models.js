@@ -45,7 +45,8 @@ export function createAccount({ name, type, category, currency, balance, note = 
 
 export function createSnapshot(accounts, settings) {
   const now = new Date();
-  const date = now.toISOString().slice(0, 7) + '-01'; // First of month
+  // Local calendar date (YYYY-MM-DD) the snapshot was taken
+  const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   let totalAssets = 0;
   let totalLiabilities = 0;

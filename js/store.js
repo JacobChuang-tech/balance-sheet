@@ -108,7 +108,7 @@ export function getSnapshots() {
 export function addSnapshot(snapshot) {
   const data = loadData();
   // Remove existing snapshot for same month
-  data.snapshots = data.snapshots.filter(s => s.date !== snapshot.date);
+  data.snapshots = data.snapshots.filter(s => s.date.slice(0, 7) !== snapshot.date.slice(0, 7));
   data.snapshots.push(snapshot);
   saveData();
   return snapshot;

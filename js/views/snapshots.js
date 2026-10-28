@@ -14,8 +14,8 @@ export function render() {
 
   // Check if snapshot exists for current month
   const now = new Date();
-  const currentMonth = now.toISOString().slice(0, 7) + '-01';
-  const hasCurrentMonth = snapshots.some(s => s.date === currentMonth);
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const hasCurrentMonth = snapshots.some(s => s.date.slice(0, 7) === currentMonth);
   const monthLabel = now.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
 
   return `
@@ -54,7 +54,7 @@ export function render() {
           }
 
           const date = new Date(snap.date + 'T00:00:00');
-          const dateStr = date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+          const dateStr = date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
           return `
             <div class="card snapshot-card" data-id="${snap.id}">
@@ -111,7 +111,7 @@ export function mount(container) {
 function showSnapshotDetail(snap) {
   const locale = getDateLocale();
   const date = new Date(snap.date + 'T00:00:00');
-  const dateStr = date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+  const dateStr = date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   const assets = snap.accounts.filter(a => a.type === 'asset');
   const liabilities = snap.accounts.filter(a => a.type === 'liability');

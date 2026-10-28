@@ -56,7 +56,7 @@ export function render() {
           ${[...snapshots].reverse().map((snap, i, arr) => {
             const prev = arr[i + 1];
             const date = new Date(snap.date + 'T00:00:00');
-            const dateStr = date.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
+            const dateStr = date.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
             let changeStr = '—';
             let changeClass = '';
             if (prev) {
@@ -107,7 +107,7 @@ function renderTrendChart(canvas, mode) {
 
   const labels = snapshots.map(s => {
     const d = new Date(s.date + 'T00:00:00');
-    return d.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
+    return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: '2-digit' });
   });
 
   const datasets = [];
