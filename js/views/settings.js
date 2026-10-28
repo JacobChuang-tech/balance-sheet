@@ -1,4 +1,5 @@
-import { getSettings, updateSettings, exportData, importData, clearAllData, syncFromDrive } from '../store.js';
+import { getSettings, updateSettings, exportData, importData, clearAllData, syncFromDrive, getBackups, summarizeData } from '../store.js';
+import { chooseSyncVersion } from '../components/sync-choice.js';
 import { isSignedIn, getProfile, signIn, signOut } from '../gdrive.js';
 import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
@@ -155,6 +156,8 @@ export function render() {
         </div>
       </div>
 
+      ${renderBackups()}
+
       <div class="settings-row">
         <div>
           <div class="settings-label">${t('settings.clearAllData')}</div>
@@ -164,6 +167,44 @@ export function render() {
       </div>
     </div>
   `;
+}
+
+function renderBackups() {
+  const backups = getBackups();
+  if (backups.length === 0) return '';
+  return `
+    <div class="settings-row settings-row--stacked">
+      <div>
+        <div class="settings-label">${t('settings.syncBackups')}</div>
+        <div class="settings-description">${t('settings.syncBackupsDesc')}</div>
+      </div>
+      <div class="backup-list">
+        ${backups.map(b => {
+          const summary = summarizeData(b.data);
+          const when = new Date(b.createdAt).toLocaleString(getDateLocale(), { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          return `
+            <div class="backup-item">
+              <div>
+                <div>${when} · ${t('sync.' + b.source)}</div>
+                <div class="settings-description">${t('sync.summaryTemplate', summary.accounts, summary.snapshots)}</div>
+              </div>
+              <button class="btn btn-secondary backup-download" data-id="${b.id}">${t('settings.download')}</button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function downloadJson(json, filename) {
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export function mount(container) {
@@ -187,7 +228,7 @@ export function mount(container) {
     syncBtn.addEventListener('click', async () => {
       syncBtn.textContent = t('settings.syncing');
       syncBtn.disabled = true;
-      const updated = await syncFromDrive();
+      const updated = await syncFromDrive(chooseSyncVersion);
       if (updated) {
         showToast(t('toast.dataSyncedFromDrive'));
         window.__applyTheme();
@@ -262,15 +303,17 @@ export function mount(container) {
 
   // Export
   container.querySelector('#export-btn').addEventListener('click', () => {
-    const json = exportData();
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `balance-sheet-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadJson(exportData(), `balance-sheet-backup-${new Date().toISOString().slice(0, 10)}.json`);
     showToast(t('toast.dataExported'));
+  });
+
+  // Download a pre-sync backup (restore it with Import)
+  container.querySelectorAll('.backup-download').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const backup = getBackups().find(b => b.id === btn.dataset.id);
+      if (!backup) return;
+      downloadJson(JSON.stringify(backup.data, null, 2), `balance-sheet-${backup.source}-backup-${backup.createdAt.slice(0, 10)}.json`);
+    });
   });
 
   // Import

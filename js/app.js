@@ -1,5 +1,6 @@
 import { initNav } from './components/nav.js';
 import { getSettings, syncFromDrive } from './store.js';
+import { chooseSyncVersion } from './components/sync-choice.js';
 import { initGoogleAuth, onSignInChange } from './gdrive.js';
 import { setLanguage, t } from './i18n.js';
 import { autoRefreshIfStale } from './rates.js';
@@ -86,7 +87,7 @@ function init() {
     initGoogleAuth(clientId);
     onSignInChange(async (signedIn) => {
       if (signedIn) {
-        const updated = await syncFromDrive();
+        const updated = await syncFromDrive(chooseSyncVersion);
         if (updated) applyTheme();
       }
       render();

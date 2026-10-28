@@ -1,4 +1,4 @@
-import { isSignedIn, saveToDrive, loadFromDrive } from './gdrive.js';
+import { isSignedIn, saveToDrive, loadFromDrive, signOut } from './gdrive.js';
 
 const STORAGE_KEY = 'balancesheet_data';
 
@@ -45,20 +45,78 @@ function scheduleDriveSync() {
   }, 2000);
 }
 
-// Pull data from Drive (called after sign-in)
-export async function syncFromDrive() {
-  if (!isSignedIn()) return false;
+// Backups of data that a sync was about to overwrite (newest first)
+const BACKUP_KEY = 'balancesheet_backups';
+const MAX_BACKUPS = 5;
+
+export function getBackups() {
   try {
+    return JSON.parse(localStorage.getItem(BACKUP_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function addBackup(source, data) {
+  const backups = getBackups();
+  backups.unshift({ id: 'bak_' + Date.now(), source, createdAt: new Date().toISOString(), data });
+  localStorage.setItem(BACKUP_KEY, JSON.stringify(backups.slice(0, MAX_BACKUPS)));
+}
+
+function hasContent(data) {
+  return !!(data.accounts?.length || data.snapshots?.length || data.transactions?.length);
+}
+
+export function summarizeData(data) {
+  const stamps = [
+    ...(data.accounts || []).map(a => a.updatedAt),
+    ...(data.snapshots || []).map(s => s.createdAt),
+    ...(data.transactions || []).map(t => t.updatedAt)
+  ].filter(Boolean).sort();
+  const snapshotDates = (data.snapshots || []).map(s => s.date).sort();
+  return {
+    accounts: (data.accounts || []).length,
+    snapshots: snapshotDates.length,
+    latestSnapshot: snapshotDates[snapshotDates.length - 1] || null,
+    lastUpdated: stamps[stamps.length - 1] || null
+  };
+}
+
+// Pull data from Drive (called after sign-in). When both sides have different data,
+// chooseVersion(localSummary, driveSummary) resolves to 'local', 'drive' or null (cancel).
+// Whichever side gets replaced is backed up first. Returns true if local data changed.
+export async function syncFromDrive(chooseVersion) {
+  if (!isSignedIn()) return false;
+  // Don't let a pending auto-sync push local data before the user has chosen
+  if (_syncTimer) clearTimeout(_syncTimer);
+  try {
+    const local = loadData();
     const driveData = await loadFromDrive();
-    if (!driveData) {
-      // No data on Drive yet — push local data up
-      await saveToDrive(loadData());
+    if (!driveData || !hasContent(driveData)) {
+      await saveToDrive(local);
       return false;
     }
-    // Merge strategy: Drive wins (latest cloud version)
-    _data = driveData;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(_data));
-    return true; // data was updated from Drive
+    if (JSON.stringify(driveData) === JSON.stringify(local)) return false;
+
+    let choice = 'drive';
+    if (hasContent(local)) {
+      choice = await chooseVersion(summarizeData(local), summarizeData(driveData));
+    }
+
+    if (choice === 'drive') {
+      if (hasContent(local)) addBackup('local', local);
+      _data = driveData;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(_data));
+      return true;
+    }
+    if (choice === 'local') {
+      addBackup('drive', driveData);
+      await saveToDrive(local);
+      return false;
+    }
+    // Cancelled: sign out so later edits don't silently overwrite Drive
+    signOut();
+    return false;
   } catch (e) {
     console.warn('Failed to sync from Drive:', e);
     return false;
