@@ -1,5 +1,5 @@
 import { getAccounts, upsertAccount, deleteAccount, getSettings } from '../store.js';
-import { ASSET_CATEGORIES, LIABILITY_CATEGORIES, getCategoryInfo, getCategoryType, createAccount } from '../models.js';
+import { ASSET_CATEGORIES, LIABILITY_CATEGORIES, getCategoryInfo, getCategoryType, createAccount, canBeLocked, getAccountTerm } from '../models.js';
 import { openModal, closeModal } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { formatCurrency } from '../components/currency.js';
@@ -70,6 +70,8 @@ function renderAccountItem(acc, settings) {
       <div class="account-item-info">
         <span class="account-item-name">${acc.name}</span>
         ${acc.note ? `<span class="account-item-note">${acc.note}</span>` : ''}
+        ${acc.type === 'liability' ? `<span class="account-item-badge">${t(getAccountTerm(acc) === 'long' ? 'accounts.termLong' : 'accounts.termShort')}</span>` : ''}
+        ${canBeLocked(acc.category) && acc.locked ? `<span class="account-item-badge">${t('accounts.locked')}</span>` : ''}
       </div>
       <div class="account-item-balance">
         <span class="account-item-amount">${formatCurrency(acc.balance, acc.currency)}</span>
@@ -134,7 +136,22 @@ function openAccountModal(existing = null) {
             ${LIABILITY_CATEGORIES.map(c => `<option value="${c.key}" ${existing?.category === c.key ? 'selected' : ''}>${t('category.' + c.key)}</option>`).join('')}
           </optgroup>
         </select>
+        <p class="form-hint" id="acc-personal-hint">${t('accounts.personalUseHint')}</p>
       </div>
+      <div class="form-group" id="acc-term-group">
+        <label class="form-label" for="acc-term">${t('accounts.term')}</label>
+        <select id="acc-term">
+          <option value="short">${t('accounts.termShort')}</option>
+          <option value="long">${t('accounts.termLong')}</option>
+        </select>
+      </div>
+      <label class="form-check" id="acc-locked-group">
+        <input type="checkbox" id="acc-locked" ${existing?.locked ? 'checked' : ''}>
+        <span>
+          <span class="form-check-label">${t('accounts.locked')}</span>
+          <span class="form-hint">${t('accounts.lockedHint')}</span>
+        </span>
+      </label>
       <div class="form-row">
         <div class="form-group form-group--grow">
           <label class="form-label" for="acc-balance">${t('accounts.balance')}</label>
@@ -164,6 +181,22 @@ function openAccountModal(existing = null) {
   const form = document.getElementById('account-form');
   document.getElementById('cancel-btn').addEventListener('click', closeModal);
 
+  // Show only the fields that apply to the selected category
+  const categorySelect = document.getElementById('acc-category');
+  const termSelect = document.getElementById('acc-term');
+  let termTouched = !!existing?.term;
+  termSelect.value = getAccountTerm(existing || { category: categorySelect.value });
+  termSelect.addEventListener('change', () => { termTouched = true; });
+  const syncCategoryFields = () => {
+    const category = categorySelect.value;
+    document.getElementById('acc-personal-hint').hidden = category !== 'fixed_assets';
+    document.getElementById('acc-term-group').hidden = getCategoryType(category) !== 'liability';
+    document.getElementById('acc-locked-group').hidden = !canBeLocked(category);
+    if (!termTouched) termSelect.value = getAccountTerm({ category });
+  };
+  categorySelect.addEventListener('change', syncCategoryFields);
+  syncCategoryFields();
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('acc-name').value.trim();
@@ -172,14 +205,16 @@ function openAccountModal(existing = null) {
     const currency = document.getElementById('acc-currency').value;
     const note = document.getElementById('acc-note').value.trim();
     const type = getCategoryType(category);
+    const term = type === 'liability' ? termSelect.value : undefined;
+    const locked = canBeLocked(category) && document.getElementById('acc-locked').checked;
 
     if (!name) return;
 
     if (isEdit) {
-      upsertAccount({ ...existing, name, type, category, balance, currency, note });
+      upsertAccount({ ...existing, name, type, category, balance, currency, note, term, locked });
       showToast(t('toast.accountUpdated'));
     } else {
-      const acc = createAccount({ name, type, category, currency, balance, note });
+      const acc = createAccount({ name, type, category, currency, balance, note, term, locked });
       upsertAccount(acc);
       showToast(t('toast.accountAdded'));
     }

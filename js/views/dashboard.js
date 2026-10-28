@@ -1,5 +1,5 @@
 import { getAccounts, getSnapshots, calculateNetWorth, getSettings, convertToBase } from '../store.js';
-import { ASSET_CATEGORIES, LIABILITY_CATEGORIES, getCategoryInfo } from '../models.js';
+import { ASSET_CATEGORIES, LIABILITY_CATEGORIES, TIERS, getCategoryInfo, computeTierTotals, getSnapshotTierTotals } from '../models.js';
 import { formatCurrency, getCurrencySymbol } from '../components/currency.js';
 import { ICONS, categoryTile } from '../components/icons.js';
 import { t } from '../i18n.js';
@@ -9,6 +9,12 @@ export function render() {
   const accounts = getAccounts();
   const snapshots = getSnapshots();
   const { totalAssets, totalLiabilities, netWorth } = calculateNetWorth();
+
+  const tiers = computeTierTotals(accounts.map(acc => ({
+    ...acc,
+    amountInBase: convertToBase(acc.balance, acc.currency, settings)
+  })));
+  const lastTiers = snapshots.length > 0 ? getSnapshotTierTotals(snapshots[0], accounts) : null;
 
   // Change since last snapshot
   let changeHTML = '';
@@ -21,6 +27,9 @@ export function render() {
     changeHTML = `
       <div class="net-worth-change ${change >= 0 ? 'net-worth-change--up' : 'net-worth-change--down'}">
         ${change >= 0 ? '▲' : '▼'} ${t('dashboard.sinceLastSnapshotTemplate', changeStr)}
+      </div>
+      <div class="net-worth-composition">
+        ${TIERS.map(tier => `<span>${t('tier.' + tier.key)} ${formatSigned(tierImpact(tier.key, tiers, lastTiers), settings.baseCurrency)}</span>`).join('<span aria-hidden="true">·</span>')}
       </div>
     `;
   }
@@ -44,6 +53,13 @@ export function render() {
         <span class="net-worth-symbol">${netWorth < 0 ? '-' : ''}${symbol}</span><span>${amountStr}</span>
       </div>
       ${changeHTML}
+      ${accounts.length > 0 ? `
+        <div class="liquid-net-worth">
+          <span class="liquid-net-worth-label">${t('dashboard.liquidNetWorth')}</span>
+          <span class="liquid-net-worth-value">${formatCurrency(tiers.liquidNetWorth, settings.baseCurrency)}</span>
+          <span class="liquid-net-worth-hint">${t('dashboard.liquidNetWorthHint')}</span>
+        </div>
+      ` : ''}
       ${renderSparkline(snapshots, netWorth)}
       <div class="net-worth-breakdown">
         <div class="net-worth-breakdown-item">
@@ -67,6 +83,10 @@ export function render() {
     ${renderOnboarding(accounts.length, snapshots.length)}
 
     ${accounts.length === 0 ? '' : `
+      <div class="tier-cards">
+        ${TIERS.map(tier => renderTierCard(tier, tiers, lastTiers, settings)).join('')}
+      </div>
+
       <div class="dashboard-grid">
         <div class="card chart-card">
           <h3 class="card-title">${t('dashboard.assetAllocation')}</h3>
@@ -75,8 +95,8 @@ export function render() {
           </div>
         </div>
 
-        <div class="card">
-          <h3 class="card-title">${t('dashboard.byCategory')}</h3>
+        <details class="card category-details">
+          <summary class="card-title">${t('dashboard.byCategory')}</summary>
           <div class="category-breakdown">
             ${categoryData.map(cat => `
               <div class="category-row">
@@ -86,7 +106,7 @@ export function render() {
               </div>
             `).join('')}
           </div>
-        </div>
+        </details>
 
         <div class="card">
           <h3 class="card-title">${t('dashboard.allAccounts')}</h3>
@@ -102,6 +122,39 @@ export function render() {
         </div>
       </div>
     `}
+  `;
+}
+
+// Contribution of a tier to the net worth change: liabilities going down counts as positive
+function tierImpact(key, current, previous) {
+  const delta = Math.round(current[key] - previous[key]);
+  return key === 'liabilities' ? -delta : delta;
+}
+
+function formatSigned(value, currency) {
+  return `${value >= 0 ? '+' : '-'}${formatCurrency(Math.abs(value), currency)}`;
+}
+
+function renderTierCard(tier, tiers, lastTiers, settings) {
+  const isLiability = tier.key === 'liabilities';
+  let deltaHTML = '';
+  if (lastTiers) {
+    const impact = tierImpact(tier.key, tiers, lastTiers);
+    const cls = impact > 0 ? 'text-green' : impact < 0 ? 'text-red' : '';
+    deltaHTML = `<div class="tier-card-delta ${cls}">${formatSigned(impact, settings.baseCurrency)}${isLiability ? ` <span class="tier-card-note">${t('dashboard.impactOnNetWorth')}</span>` : ''}</div>`;
+  }
+  return `
+    <div class="card tier-card">
+      <div class="tier-card-label"><i class="tier-dot" style="background:${tier.color}"></i>${t('tier.' + tier.key)}</div>
+      <div class="tier-card-value ${isLiability ? 'text-red' : ''}">${isLiability ? '-' : ''}${formatCurrency(tiers[tier.key], settings.baseCurrency)}</div>
+      ${deltaHTML}
+      ${isLiability ? `
+        <div class="tier-card-split">
+          <span>${t('accounts.termShort')} ${formatCurrency(tiers.shortTerm, settings.baseCurrency)}</span>
+          <span>${t('accounts.termLong')} ${formatCurrency(tiers.longTerm, settings.baseCurrency)}</span>
+        </div>
+      ` : ''}
+    </div>
   `;
 }
 

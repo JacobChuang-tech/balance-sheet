@@ -1159,3 +1159,228 @@
     word-break: break-word;
   }
 }
+
+/* Dashboard: net worth composition & liquid net worth (hero) */
+.net-worth-composition {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-hero-text-secondary);
+}
+
+.liquid-net-worth {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px var(--space-sm);
+  margin-top: var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.liquid-net-worth-label {
+  color: var(--color-hero-text-secondary);
+}
+
+.liquid-net-worth-value {
+  font-weight: var(--font-weight-semibold);
+}
+
+.liquid-net-worth-hint {
+  flex-basis: 100%;
+  font-size: var(--font-size-xs);
+  color: var(--color-hero-text-secondary);
+}
+
+/* Dashboard: tier cards */
+.tier-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+@media (min-width: 1100px) {
+  .tier-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.tier-card-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.tier-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.tier-card-label .tier-dot {
+  margin-right: 0;
+}
+
+.tier-card-value {
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .tier-card-value {
+    font-size: var(--font-size-base);
+  }
+}
+
+.tier-card-delta {
+  margin-top: 2px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.tier-card-note {
+  color: var(--color-text-muted);
+}
+
+/* Trends: history table */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th {
+  text-align: left;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.history-table th,
+.history-table td {
+  padding: var(--space-sm) 0 var(--space-sm) var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.history-table th:first-child,
+.history-table td:first-child {
+  padding-left: 0;
+}
+
+.history-table .num {
+  text-align: right;
+}
+
+.history-net {
+  font-weight: var(--font-weight-semibold);
+}
+
+.history-detail {
+  display: none;
+}
+
+.history-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 1099px) {
+  .history-table .col-tier {
+    display: none;
+  }
+
+  .history-row {
+    cursor: pointer;
+  }
+
+  .history-row--expanded td {
+    border-bottom: none;
+  }
+
+  .history-row--expanded + .history-detail {
+    display: table-row;
+  }
+}
+
+/* Account form: term / locked fields */
+.form [hidden] {
+  display: none;
+}
+
+.form-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+
+.form-check input {
+  margin-top: 3px;
+}
+
+.form-check > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.form-check-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.account-item-badge {
+  align-self: flex-start;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-hover);
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* Dashboard: liability term split, collapsible category card */
+.tier-card-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--space-sm);
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.category-details {
+  align-self: start;
+}
+
+.category-details > summary {
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.category-details[open] > summary {
+  margin-bottom: var(--space-md);
+}
+
+/* Trends: estimate note */
+.chart-note {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
